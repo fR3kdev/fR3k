@@ -64,6 +64,20 @@ Target path:
 
 ---
 
+## 2026-09-14 — Arga Labs three-app sandbox vertical slice
+
+- Recorded the capability inventory and mission decision in [`HACKATHON_DIRECTIVE.md`](HACKATHON_DIRECTIVE.md).
+- Added `agentic-action-engine/src/demo/arga-mission.ts`: Support Desk incident read, Billing charge read/refund, and CRM resolution tools through the real `Runtime` and `ToolRegistry`.
+- Added `src/cli.ts`; `npm run demo` exercises the mission, pauses at both exact approval gates, performs read-after-write verification, and prints an independent evaluator score of `1.00`.
+- Added `tests/arga-mission.test.ts`; the test proves the unrelated charge is preserved and all tool evidence is labelled `SIMULATION_ONLY`.
+- Verification: `npm test` = 29 passed, `npm run typecheck` = passed, `npm run demo` = exit 0. This is a local sandbox proof, not live external-app evidence.
+
+### Next
+
+Implement replay/counterfactual support and the local dashboard, then pursue a separately approved live-app capability path. Do not treat the sandbox mission as completion of the external three-app gate.
+
+---
+
 ## Logging rule
 
 Future entries should record concrete changes, not hype.

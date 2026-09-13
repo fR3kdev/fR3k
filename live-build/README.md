@@ -26,6 +26,8 @@ Core loop:
 
 The point is not to produce clever text. The point is to change state across real tools, verify the change, and leave receipts.
 
+The first runnable vertical slice is the Arga Labs duplicate-charge mission: Support Desk → Billing → CRM. Run it with `cd agentic-action-engine && npm run demo`. It is a production-shaped local sandbox and every observation is explicitly labelled `SIMULATION_ONLY`; live external-app verification remains pending.
+
 ## Four worlds, one engine
 
 | World | Mission | Proof of value |

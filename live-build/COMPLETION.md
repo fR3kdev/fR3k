@@ -11,8 +11,8 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 | Independent evaluator and bounded replanning | Final-state and trajectory assertions; deliberate failure remains a failure | Partial: local success/failure, evidence validation and bounded-replan tests pass |
 | Memory and replay | Evidence-backed retrieval; isolated baseline/candidate runs; checkpoint comparison | Pending |
 | Selected 3+ app adapters | Contract tests plus authenticated read/write/read-back evidence | Pending capability inventory and mission decision |
-| First real three-app mission | One coherent workflow → independent verification → durable evidence | Pending mission selection and implementation |
-| Reliability scenarios | Transient errors, ambiguous side effects, idempotency, injection, denial, and replay regressions pass | Pending |
+| First three-app mission | One coherent workflow → independent verification → durable evidence | Partial: Arga Support Desk → Billing → CRM sandbox CLI passes; live external-app proof pending |
+| Reliability scenarios | Transient errors, ambiguous side effects, idempotency, injection, denial, and replay regressions pass | Partial: core runtime reliability tests pass; mission-specific failure/replay coverage pending |
 | Dashboard | Browser-verified mission, plan, state, trace, tool cards, memory, confidence, autonomy, approval, evaluation, replay, cost and latency | Pending |
 | Lemma | Failed trace → reviewable repair → failing baseline/passing candidate → regression evidence | Pending |
 | Comma Capital | Grounded diagnosis → explained ranking → approval → outreach → acceptance/outcome memory | Pending |

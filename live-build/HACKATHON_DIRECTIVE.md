@@ -38,9 +38,27 @@ Build and demonstrate one coherent agent that:
 7. Verify the real workflow, capture evidence and prepare the live demo.
 8. Only then improve polish, secondary scenarios or reusable abstractions.
 
+## Recorded mission decision — 2026-09-14
+
+Capability inventory observed before implementation:
+
+| Capability | Evidence | Boundary |
+|---|---|---|
+| GitHub API / repository access | authenticated `gh auth status`; active `fr3k-d3v` account has `repo` and `workflow` scopes | live reads/writes require a separately configured allowlist and approval |
+| Google Workspace | no Google credential environment or OAuth grant observed | not available for live verification; Gmail/Calendar remain rejected |
+| Local runtime | `agentic-action-engine/` typechecks and 28 behavior tests pass | synthetic sandbox is not external-app evidence |
+
+The first vertical slice is the **Arga Labs duplicate-charge incident mission**. It uses three necessary app boundaries in a production-shaped local sandbox:
+
+1. Support Desk: read the incident and customer identity.
+2. Billing: read the target charge and perform the approved refund.
+3. CRM: update the incident status after the refund and verify the exact record.
+
+The mission succeeds only when the runtime observes the incident and charge, pauses before each consequential write, executes after an exact operator approval, reads both write results back, and an independent evaluator checks the final Billing and CRM state plus preservation of an unrelated charge. All sandbox observations are labelled `SIMULATION_ONLY`; this does not claim live external-app completion. Live connector selection remains a separate gate requiring verified credentials, resource allowlists and approved test actions.
+
 ## Scope guard
 
-Until the chosen mission is recorded, work is limited to preserving current state, validating the runtime, inventorying usable integrations and removing the rejected Gmail/calendar path. Do not invent another product direction without recording the decision and evidence.
+The mission is now recorded. Implementation may proceed on this vertical slice and its tests, while live external-app work remains gated by capability and approval evidence. Do not authenticate Gmail or Calendar or revive the rejected route.
 
 ## Completion evidence
 

@@ -17,8 +17,9 @@
 | Append-only execution trace | 🟨 PARTIALLY_VERIFIED | fsynced JSONL, sequence/hash checks and concurrent-writer tests; full crash recovery pending |
 | Independent evaluator | 🟨 PARTIALLY_VERIFIED | local final-state, trajectory, evidence and bounded-replanning tests pass |
 | Replay / counterfactual runner | ⏳ BUILDING | contract defined, implementation pending |
+| Arga three-app sandbox mission | 🟨 PARTIALLY_VERIFIED | runnable Support Desk → Billing → CRM vertical slice; all evidence is `SIMULATION_ONLY` |
 | GitHub connector | ⏳ BUILDING | live repo operations work; contest runtime adapter pending |
-| App capability inventory | ⏳ BUILDING | choose 3+ necessary apps from verified access |
+| App capability inventory | 🟨 PARTIALLY_VERIFIED | GitHub access observed; Google access unavailable; live 3-app selection remains gated |
 | Gmail / Calendar route | ❌ REJECTED | do not authenticate or implement |
 | Live dashboard | ⬜ NOT TESTED | planned after runtime core |
 | End-to-end 3+ app mission | ⬜ NOT TESTED | must be proven before demo |
@@ -29,17 +30,17 @@ The [completion ledger](COMPLETION.md) records current test evidence and remaini
 
 ### P0 — make one mission work end to end
 
-- [ ] core types
-- [ ] state machine
-- [ ] typed tool registry
-- [ ] autonomy / policy gate
-- [ ] trace writer
-- [ ] evaluator
+- [x] core types
+- [x] state machine
+- [x] typed tool registry
+- [x] autonomy / policy gate
+- [x] trace writer
+- [x] evaluator
 - [ ] GitHub adapter
 - [ ] Google Workspace adapter(s)
-- [ ] approval checkpoint
-- [ ] read-after-write verification
-- [ ] one passing multi-app scenario
+- [x] approval checkpoint
+- [x] read-after-write verification
+- [x] one passing sandbox multi-app scenario (not live external evidence)
 
 ### P1 — prove reliability
 
