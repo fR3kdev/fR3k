@@ -23,7 +23,9 @@ class VramSampler(threading.Thread):
             time.sleep(0.5)
 
 def unload(model):
-    sh(f'curl -fsS -X POST http://127.0.0.1:11434/api/generate -d \'{{"model":"{model}","keep_alive":0}}\'', timeout=20)
+    payload = json.dumps({"model": model, "keep_alive": 0})
+    sh(["curl", "-fsS", "-X", "POST", "http://127.0.0.1:11434/api/generate",
+        "-H", "Content-Type: application/json", "-d", payload], timeout=20)
     time.sleep(2)
 
 def launch_cell(cell, base_model, deriv):
