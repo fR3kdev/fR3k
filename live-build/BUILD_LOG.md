@@ -6,6 +6,22 @@ It is intentionally plain: timestamp / change / evidence / next move.
 
 ---
 
+## 2026-09-14 — gap-fill: crash recovery, replay, and hardened Arga evidence
+
+- Hardened `src/trace/jsonl.ts`: stale-lock recovery for provably dead owner PIDs (live owners stay busy), and an audited `repairTail(runId)` that snapshots the original bytes, truncates only the uncommitted journal tail, and refuses to touch a corrupted committed prefix.
+- Runtime (`src/core/orchestrator.ts`): `timed()` deadline that raises `HangError` for planner/tool/evaluator hangs; approval validity rechecked immediately before every write attempt; `recover()` grants an audited, bounded read budget after a `TOOL_UNAVAILABLE`; approval digests now bind the tool implementation `revision` so a deploy under a pending action invalidates it.
+- `src/core/state-machine.ts`: an `approval.denied` is authoritative even when the process died before the terminal status append.
+- `src/eval/evaluator.ts`: a final-state claim about a run that performed writes must cite a confirmed read-back for each written tool.
+- Arga mission (`src/demo/arga-mission.ts`): v2 planner/evaluator prove duplicity from the raw payment ledger, persist durable refund records, bind exact customer/amount/currency, read back the unrelated CHG-89, and `reconstructArgaState` rebuilds app state from the journal; refunds are replay-safe (no second refund after recovery).
+- Added `src/demo/replay-bridge.ts`: crash replay re-runs the same planner/evaluator against rebuilt state; counterfactual runs an alternative design and diffs which checks each evaluated. `src/cli.ts` now prints live result, replay, and counterfactual.
+- Verification: `npm test` = **55 passed**, typecheck passed, `npm run demo` exits 0 with replay candidate `CONFIRMED_SUCCESS` (score 1.00, zero regressions) and the v1 counterfactual that never evaluates duplicate-proven / unrelated-preserved / incident-grounded. Still `SIMULATION_ONLY`; no live external apps were touched.
+
+### Next
+
+Resolve the live three-app gate, add the model-driven planner, durable outcome memory and the full adversarial variant set, then publish from `main` after CI confirmation.
+
+---
+
 ## 2026-09-14 — local runtime foundation and isolated development briefs
 
 - Saved the plain-language [synopsis](SYNOPSIS.md) in the primary checkout and linked it from the README.

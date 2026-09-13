@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { decisionSchema, json, missionSchema, type Action, type Evaluator, type Json, type Planner, type PlannerContext, type RunStatus, type RunView } from './types.js';
+import { decisionSchema, identifier, json, missionSchema, HangError, type Action, type Evaluator, type Json, type Planner, type PlannerContext, type RunStatus, type RunView } from './types.js';
 import { project, terminal } from './state-machine.js';
 import { TraceStore, digest, type Journal } from '../trace/jsonl.js';
 import { ToolFault, ToolRegistry, type RegisteredTool, type ToolContext, type Verification } from '../tools/registry.js';
@@ -8,6 +8,18 @@ import { evaluateTrajectory } from '../eval/evaluator.js';
 import { MemoryStore, memorySchema } from '../memory/store.js';
 
 export interface RuntimeOptions { timeoutMs?: number; approvalTtlMs?: number; maxReadAttempts?: number }
+
+/**
+ * A hard wall-clock firewall. Provider code receives an abort signal at
+ * `timeoutMs`; if it ignores cancellation, this bound still rejects shortly
+ * after, so a hung side effect can never block the journal's owner forever.
+ */
+function timed<T>(timeoutMs: number, task: () => Promise<T>): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new HangError()), timeoutMs);
+    task().then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
+  });
+}
 
 export class Runtime {
   readonly timeoutMs: number;
@@ -73,7 +85,7 @@ export class Runtime {
         }
         const context = this.context(journal);
         let decision;
-        try { decision = decisionSchema.parse(await this.planner.decide(context, AbortSignal.timeout(this.timeoutMs))); }
+        try { decision = decisionSchema.parse(await timed(this.timeoutMs, () => this.planner.decide(context, AbortSignal.timeout(this.timeoutMs)))); }
         catch {
           await journal.append('planner.error', { code: 'INVALID_OR_UNAVAILABLE_PLANNER' });
           return this.status(journal, 'CONFIRMED_FAILURE', 'Planner failed or returned an invalid decision');
@@ -82,7 +94,7 @@ export class Runtime {
           await journal.append('plan.finish', { reason: decision.reason });
           let evaluation;
           try {
-            evaluation = evaluateTrajectory(journal.events, await this.evaluator.evaluate(this.context(journal), AbortSignal.timeout(this.timeoutMs)));
+            evaluation = evaluateTrajectory(journal.events, await timed(this.timeoutMs, () => this.evaluator.evaluate(this.context(journal), AbortSignal.timeout(this.timeoutMs))));
           } catch {
             return this.status(journal, 'CONFIRMED_FAILURE', 'Independent evaluator failed or returned invalid evidence');
           }
@@ -120,13 +132,28 @@ export class Runtime {
   }
 
   private actionDigest(view: RunView, action: Action, tool: RegisteredTool): string {
-    const { execute: _execute, verify: _verify, parse: _parse, ...metadata } = tool;
-    // Registered definitions also carry Zod instances; include only serializable contract fields.
+    const { execute: _execute, verify: _verify, parse: _parse, inputSchema, outputSchema, ...metadata } = tool;
+    // Bind the executable revision, serialized contract, policy, and exact action.
     return digest({ runId: view.mission.id, policy: view.mission.policy, action,
-      tool: { name: metadata.name, effect: metadata.effect, autonomy: metadata.autonomy,
+      tool: { revision: metadata.revision, name: metadata.name, effect: metadata.effect, autonomy: metadata.autonomy,
         environment: metadata.environment, idempotency: metadata.idempotency,
-        inputSchema: metadata.inputSchema, outputSchema: metadata.outputSchema,
+        inputSchema, outputSchema,
         reversible: metadata.reversible, blastRadius: metadata.blastRadius, verificationMethod: metadata.verificationMethod } });
+  }
+
+  /**
+   * Explicit, bounded recovery after an exhausted read budget or an unavailable
+   * tool. It records an audited grant and lets the run retry reads; it never
+   * retries an unverified write and never loosens policy.
+   */
+  async recover(runId: string): Promise<RunView> {
+    identifier.parse(runId);
+    await this.store.withRun(runId, async journal => {
+      const view = project(journal.events);
+      if (view.status !== 'TOOL_UNAVAILABLE') throw new Error('Recovery is only available after a tool availability failure');
+      await journal.append('runtime.recovery', { reason: 'Operator granted an additional bounded read budget' });
+    });
+    return this.run(runId);
   }
 
   private async status(journal: Journal, status: RunStatus, reason: string): Promise<RunView> {
@@ -154,7 +181,7 @@ export class Runtime {
     const verify = async (): Promise<Verification> => {
       const output = stepEvents().filter(e => e.kind === 'tool.result').at(-1)?.data.output;
       let result: Verification;
-      try { result = await tool.verify(action.input, context(), output); }
+      try { result = await timed(this.timeoutMs, () => tool.verify(action.input, context(), output)); }
       catch { result = { status: 'unknown', source: tool.verificationMethod }; }
       await journal.append('tool.verification', {
         step, tool: tool.name, status: result.status, source: result.source,
@@ -163,7 +190,8 @@ export class Runtime {
       return result;
     };
     let attempts = stepEvents().filter(e => e.kind === 'tool.started').length;
-    // A previous process may have died after the provider accepted the write.
+    // A previous process may have died after the provider accepted the write;
+    // reconcile the exact side effect before deciding whether to write again.
     if (tool.effect === 'write' && attempts > 0) {
       const reconciliation = await verify();
       if (reconciliation.status === 'confirmed') return complete();
@@ -178,26 +206,33 @@ export class Runtime {
     const policy = checkPolicy(view.mission.policy, tool, writtenSteps.size);
     await journal.append('policy.decision', { step, ...policy });
     if (policy.decision === 'deny') { await this.status(journal, 'DENIED_BY_POLICY', policy.reason); return false; }
-    if (policy.decision === 'approve') {
-      const granted = stepEvents().filter(e => e.kind === 'approval.granted' && e.data.digest === actionDigest).at(-1);
-      if (!granted || Number(granted.data.expiresAt) <= Date.now()) {
-        const previous = stepEvents().filter(e => e.kind === 'approval.requested').at(-1);
-        if (!previous || Number(previous.data.expiresAt) <= Date.now()) {
-          await journal.append('approval.requested', { step, digest: actionDigest, action: json(action), expiresAt: Date.now() + this.approvalTtlMs });
-        }
-        await this.status(journal, 'WAITING_FOR_APPROVAL', policy.reason); return false;
+    const requestApproval = async (reason: string): Promise<boolean> => {
+      const previous = stepEvents().filter(e => e.kind === 'approval.requested').at(-1);
+      if (!previous || Number(previous.data.expiresAt) <= Date.now()) {
+        await journal.append('approval.requested', { step, digest: actionDigest, action: json(action), expiresAt: Date.now() + this.approvalTtlMs });
       }
-    }
-    const maxAttempts = tool.effect === 'write' ? 2 : this.maxReadAttempts;
+      await this.status(journal, 'WAITING_FOR_APPROVAL', reason);
+      return false;
+    };
+    const approvedAtBoundary = async (): Promise<boolean> => {
+      const granted = stepEvents().filter(e => e.kind === 'approval.granted' && e.data.digest === actionDigest).at(-1);
+      return Boolean(granted && Number(granted.data.expiresAt) > Date.now());
+    };
+    if (policy.decision === 'approve' && !await approvedAtBoundary()) return requestApproval(policy.reason);
+    const recoveries = journal.events.filter(e => e.kind === 'runtime.recovery').length;
+    const maxAttempts = tool.effect === 'write' ? 2 : this.maxReadAttempts * (recoveries + 1);
     while (attempts < maxAttempts) {
       attempts++;
       await journal.append('tool.started', { step, tool: tool.name, effect: tool.effect, digest: actionDigest, attempt: attempts, idempotencyKey: context().idempotencyKey });
+      // Recheck validity immediately before each side effect, not only once before the loop.
+      if (policy.decision === 'approve' && !await approvedAtBoundary()) return requestApproval('Approval expired before the write executed');
       let errorCode: string | undefined;
       try {
-        const output = await tool.execute(action.input, context());
+        const output = await timed(this.timeoutMs, () => tool.execute(action.input, context()));
         await journal.append('tool.result', { step, tool: tool.name, effect: tool.effect, output, observation: output, label });
       } catch (error) {
-        errorCode = error instanceof ToolFault ? error.code : 'INVALID_OUTPUT_OR_UNCLASSIFIED_ERROR';
+        errorCode = error instanceof HangError ? (tool.effect === 'write' ? 'UNCERTAIN' : 'TRANSIENT')
+          : error instanceof ToolFault ? error.code : 'INVALID_OUTPUT_OR_UNCLASSIFIED_ERROR';
         await journal.append('tool.error', { step, tool: tool.name, code: errorCode });
       }
       if (tool.effect === 'read') {

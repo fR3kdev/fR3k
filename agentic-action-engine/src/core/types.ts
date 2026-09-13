@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 export const json = (value: unknown): Json => z.json().parse(value);
+/** Deadline fired even though the provider ignored the abort signal. */
+export class HangError extends Error {}
 export const identifier = z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,95}$/);
 export const policySchema = z.strictObject({
   allowedTools: z.array(identifier).min(1),
@@ -39,7 +41,7 @@ export const eventKinds = [
   'run.created', 'run.status', 'plan.action', 'plan.finish', 'planner.error',
   'policy.decision', 'approval.requested', 'approval.granted', 'approval.denied',
   'tool.started', 'tool.result', 'tool.error', 'tool.verification', 'step.completed',
-  'memory.retrieved', 'evaluation.result', 'replan.requested',
+  'memory.retrieved', 'evaluation.result', 'replan.requested', 'runtime.recovery',
 ] as const;
 export const eventSchema = z.strictObject({
   version: z.literal(1), runId: identifier, seq: z.int().positive(),

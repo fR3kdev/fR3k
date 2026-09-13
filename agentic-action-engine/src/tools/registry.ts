@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { identifier, json, type Json } from '../core/types.js';
 
@@ -22,12 +23,15 @@ export interface ToolMetadata {
   verificationMethod: string;
 }
 export interface ToolDefinition<I, O> extends ToolMetadata {
+  /** Explicit implementation revision; defaults to a hash of the executable source. */
+  revision?: string;
   input: z.ZodType<I>;
   output: z.ZodType<O>;
   execute(input: I, context: ToolContext): Promise<O>;
   verify?: (input: I, context: ToolContext, output?: O) => Promise<Verification>;
 }
 export interface RegisteredTool extends ToolMetadata {
+  revision: string;
   inputSchema: Json;
   outputSchema: Json;
   parse(input: unknown): Json;
@@ -62,8 +66,13 @@ export class ToolRegistry {
       z.strictObject({ status: z.literal('confirmed'), source: z.string().min(1), observation: z.json() }),
       z.strictObject({ status: z.enum(['absent', 'unknown']), source: z.string().min(1), observation: z.json().optional() }),
     ]);
+    // Bind the deployed executable, not just the declared contract, so a pending
+    // action cannot silently execute against changed adapter implementation.
+    const revision = definition.revision ?? createHash('sha256')
+      .update(`${definition.execute.toString()}\n${definition.verify?.toString() ?? ''}`).digest('hex').slice(0, 16);
     const tool: RegisteredTool = {
       ...definition,
+      revision,
       inputSchema: json(z.toJSONSchema(definition.input)),
       outputSchema: json(z.toJSONSchema(definition.output)),
       parse: value => json(definition.input.parse(value)),

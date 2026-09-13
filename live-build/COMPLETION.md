@@ -7,25 +7,34 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 | Work | Acceptance evidence | State |
 |---|---|---|
 | Plain-language synopsis | Synopsis saved in this checkout; README link resolves | Complete locally; not published |
-| Core runtime, typed tools, policy, approvals, trace | Typecheck and behavioral tests; restart, denial, malformed input, and duplicate-action coverage | Partial: 28 local runtime tests and typecheck pass; process-crash recovery and live integration still pending |
-| Independent evaluator and bounded replanning | Final-state and trajectory assertions; deliberate failure remains a failure | Partial: local success/failure, evidence validation and bounded-replan tests pass |
-| Memory and replay | Evidence-backed retrieval; isolated baseline/candidate runs; checkpoint comparison | Pending |
-| Selected 3+ app adapters | Contract tests plus authenticated read/write/read-back evidence | Pending capability inventory and mission decision |
-| First three-app mission | One coherent workflow → independent verification → durable evidence | Partial: Arga Support Desk → Billing → CRM sandbox CLI passes; live external-app proof pending |
-| Reliability scenarios | Transient errors, ambiguous side effects, idempotency, injection, denial, and replay regressions pass | Partial: core runtime reliability tests pass; mission-specific failure/replay coverage pending |
-| Dashboard | Browser-verified mission, plan, state, trace, tool cards, memory, confidence, autonomy, approval, evaluation, replay, cost and latency | Pending |
+| Core runtime, typed tools, policy, approvals, trace | Typecheck and behavioral tests; restart, denial, malformed input, and duplicate-action coverage | Complete: 55 local runtime tests and typecheck pass; stale-lock recovery, audited repairTail, denial-authoritative projection, deadline enforcement and revision-bound approvals tested. Live integration still pending |
+| Independent evaluator and bounded replanning | Final-state and trajectory assertions; deliberate failure remains a failure; write read-back grounding | Complete: local success/failure, evidence validation, grounding and bounded-replan tests pass |
+| Durable recovery and replay | Rebuild app state from the journal after a crash; isolated baseline/candidate runs; checkpoint comparison | Complete locally: `reconstructArgaState`, idempotent refund, `replay-bridge.ts` crash replay and counterfactual diffs; tests and `npm run demo` pass |
+| Selected 3+ app adapters | Contract tests plus authenticated read/write/read-back evidence | Pending capability inventory and mission decision; GitHub adapters contract-tested only |
+| First three-app mission | One coherent workflow → independent verification → durable evidence | Partial: Arga Support Desk → Billing → CRM sandbox runs at a 1.00 score and replay passes; live external-app proof pending |
+| Reliability scenarios | Transient errors, ambiguous side effects, idempotency, injection, denial, crash recovery, deadline and replay regressions pass | Complete: reliability fixtures and mission replay coverage pass locally |
+| Dashboard | Browser-verified mission, plan, state, trace, tool cards, memory, confidence, autonomy, approval, evaluation, replay, cost and latency | Partial: loopback UI and comparisons browser-verified against the real runtime; replay render and cost/latency not yet surfaced |
 | Lemma | Failed trace → reviewable repair → failing baseline/passing candidate → regression evidence | Pending |
 | Comma Capital | Grounded diagnosis → explained ranking → approval → outreach → acceptance/outcome memory | Pending |
-| Arga Labs | Duplicate-charge sandbox workflow and all eight documented adversarial variants pass appropriate evaluators | Pending |
+| Arga Labs | Duplicate-charge sandbox workflow and all eight documented adversarial variants pass appropriate evaluators | Partial: hardened v2 workflow, ledger proof and unrelated-preservation pass; adversarial variant set not implemented |
 | Userlens | Bounded cohort, treatment/control, observed outcomes, and intervention-memory update | Pending |
-| Reproducibility and handoff | Clean dependency install, full tests, typecheck, CI configuration, run instructions, current status/build log | Pending |
-| Publication | Reviewed local changes and published repository state verified | Pending |
+| Reproducibility and handoff | Clean dependency install, full tests, typecheck, CI configuration, run instructions, current status/build log | Partial: documented and runnable; publication pending |
+| Publication | Reviewed local changes and published repository state verified | Pending; see BUILD_LOG/this session |
 
 ## Isolated development assignments
 
 - [Pathway 1: live app connectors](DEVELOPMENT_PATHWAY_CONNECTORS.md) owns `src/connectors/` and its own tests/documentation.
 - [Pathway 2: dashboard](DEVELOPMENT_PATHWAY_DASHBOARD.md) owns `src/dashboard/` and its own tests/documentation.
 - Two agents were started concurrently from committed baseline `ab2be86`: GitHub-only adapters and dashboard. The main agent owns integration, shared configuration and combined verification. The old Google connector scope remains superseded.
+
+## Latest local verification — 2026-09-14 (gap-fill session)
+
+- `cd agentic-action-engine && npm test`: **55 passed, 0 failed, 0 skipped** (46 prior + 9 new reliability/replay tests).
+- `cd agentic-action-engine && npm run typecheck`: passed.
+- `npm run demo`: `CONFIRMED_SUCCESS`, evaluator **1.00**; then prints crash replay (candidate `CONFIRMED_SUCCESS`, score 1.00, zero regressions) and the v1 counterfactual (billing.duplicate-proven, billing.unrelated-preserved and support.incident-grounded are checks the old design never evaluates).
+- New reliability coverage: stale-lock recovery and live-owner busy; audited `repairTail` (snapshot preserved, only uncommitted tail truncated, corrupt committed bytes refused); denial-authoritative projection after a torn status append; `HangError` deadline on a hung planner; hung read budget exhaustion plus operator `recover()`; deployed tool-revision invalidation of a granted approval; `reconstructArgaState` and replay that never mints a second refund; counterfactual diff of the v1 design.
+- Arga v2 hardening: raw payment-ledger duplicate proof, durable refund records, exact customer/amount/currency binding, evidence-specific evaluator references, unrelated-charge read-back, and replay-safe (idempotent) refunds.
+- These results cover synthetic sandbox behavior. They do not validate live external apps, a model-driven planner, durable outcome memory, the full adversarial variant set, or publication.
 
 ## Latest local verification — 2026-09-14
 
