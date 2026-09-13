@@ -7,7 +7,8 @@
     "demo": "tsx src/cli.ts",
     "test": "node --import tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "dashboard": "tsx src/demo/dashboard-cli.ts"
+    "dashboard": "tsx src/demo/dashboard-cli.ts",
+    "demo:live": "tsx src/live-cli.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
