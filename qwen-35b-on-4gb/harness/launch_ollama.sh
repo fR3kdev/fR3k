@@ -43,6 +43,12 @@ curl -fsS -X POST http://127.0.0.1:11434/api/generate \
 EXPECTED_ENV="OLLAMA_KV_CACHE_TYPE=${KV_TYPE}"
 CURRENT="$(systemctl show ollama -p Environment --value 2>/dev/null || true)"
 if ! echo "$CURRENT" | grep -q "$EXPECTED_ENV"; then
+  if [ "${ALLOW_SYSTEM_OLLAMA_CHANGES:-0}" != "1" ]; then
+    echo "REFUSING: this sweep must change the Ollama systemd service to test KV cache settings." >&2
+    echo "Review this script, then rerun with ALLOW_SYSTEM_OLLAMA_CHANGES=1 if you consent." >&2
+    rm -f "$TMPF"
+    exit 64
+  fi
   # This benchmark changes the system Ollama service. Configure passwordless
   # sudo for only these service-management commands, or run interactively.
   sudo systemctl stop ollama
