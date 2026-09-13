@@ -1,5 +1,7 @@
 # Development pathway 1 — Live app connectors
 
+> **SUPERSEDED — DO NOT EXECUTE.** The Gmail/Google connector route was rejected. Follow [HACKATHON_DIRECTIVE.md](HACKATHON_DIRECTIVE.md); do not authenticate or implement Gmail or Calendar from this brief.
+
 ## Mission and ownership
 
 Build the real GitHub, Google Sheets, Google Drive and Gmail adapters for the first three-app mission. The main agent owns orchestration, policy, approvals, traces, evaluation, replay, domain scenarios, CLI integration and shared project configuration. The other delegated pathway owns the dashboard.
