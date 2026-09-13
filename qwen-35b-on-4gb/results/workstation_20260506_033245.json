@@ -1,0 +1,270 @@
+{
+  "rig": "workstation",
+  "rows": [
+    {
+      "cell": "auto_4k_q8",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 4096,
+        "KV_TYPE": "q8_0",
+        "USE_MMAP": "true",
+        "USE_MLOCK": "true",
+        "label": "auto_4k_q8"
+      },
+      "suite": "short",
+      "summary": {
+        "n_items": 3,
+        "n_pass": 3,
+        "mean_gen_tok_per_s": 5.47,
+        "max_gen_tok_per_s": 5.59,
+        "mean_prefill_tok_per_s": 15.37
+      },
+      "rows": [
+        {
+          "gen_tok_per_s": 5.59,
+          "prefill_tok_per_s": 14.78,
+          "predicted_n": 27,
+          "prompt_n": 35,
+          "wall_s": 217.86,
+          "id": "primes",
+          "ok": true,
+          "tail": "ANSWER: 2, 3, 5, 7, 11, 13, 17"
+        },
+        {
+          "gen_tok_per_s": 5.37,
+          "prefill_tok_per_s": 16.15,
+          "predicted_n": 87,
+          "prompt_n": 72,
+          "wall_s": 20.98,
+          "id": "code_bal",
+          "ok": true,
+          "tail": "if c in pairs:\n            if not stack or stack.pop() != pairs[c]: return False\n        elif c in pairs.values():\n            stack.append(c)\n    return not stack\n```\nANSWER: True"
+        },
+        {
+          "gen_tok_per_s": 5.44,
+          "prefill_tok_per_s": 15.18,
+          "predicted_n": 96,
+          "prompt_n": 40,
+          "wall_s": 20.57,
+          "id": "speed",
+          "ok": true,
+          "tail": "ializing different experts for distinct features, the architecture achieves superior performance and efficiency in handling complex, diverse data patterns effectively. ANSWER: done"
+        }
+      ],
+      "load_s": 94.2,
+      "vram_peak_mb": 3367
+    },
+    {
+      "cell": "auto_4k_q4",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 4096,
+        "KV_TYPE": "q4_0",
+        "USE_MMAP": "true",
+        "USE_MLOCK": "true",
+        "label": "auto_4k_q4"
+      },
+      "suite": "short",
+      "summary": {
+        "n_items": 3,
+        "n_pass": 3,
+        "mean_gen_tok_per_s": 5.35,
+        "max_gen_tok_per_s": 5.37,
+        "mean_prefill_tok_per_s": 15.11
+      },
+      "rows": [
+        {
+          "gen_tok_per_s": 5.37,
+          "prefill_tok_per_s": 13.97,
+          "predicted_n": 27,
+          "prompt_n": 35,
+          "wall_s": 10.69,
+          "id": "primes",
+          "ok": true,
+          "tail": "ANSWER: 2, 3, 5, 7, 11, 13, 17"
+        },
+        {
+          "gen_tok_per_s": 5.35,
+          "prefill_tok_per_s": 16.19,
+          "predicted_n": 83,
+          "prompt_n": 72,
+          "wall_s": 20.26,
+          "id": "code_bal",
+          "ok": true,
+          "tail": "s:\n        if c in pairs:\n            if not stack or stack.pop() != pairs[c]: return False\n        elif c in pairs.values(): stack.append(c)\n    return not stack\n```\n\nANSWER: True"
+        },
+        {
+          "gen_tok_per_s": 5.34,
+          "prefill_tok_per_s": 15.18,
+          "predicted_n": 96,
+          "prompt_n": 40,
+          "wall_s": 20.88,
+          "id": "speed",
+          "ok": true,
+          "tail": "tecture achieves superior performance on complex tasks, offering a scalable and efficient alternative to dense transformer models in modern deep learning applications. ANSWER: done"
+        }
+      ],
+      "load_s": 15.1,
+      "vram_peak_mb": 3059
+    },
+    {
+      "cell": "auto_8k_q4",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 8192,
+        "KV_TYPE": "q4_0",
+        "USE_MMAP": "true",
+        "USE_MLOCK": "true",
+        "label": "auto_8k_q4"
+      },
+      "suite": "short",
+      "summary": {
+        "n_items": 3,
+        "n_pass": 3,
+        "mean_gen_tok_per_s": 5.52,
+        "max_gen_tok_per_s": 5.56,
+        "mean_prefill_tok_per_s": 15.41
+      },
+      "rows": [
+        {
+          "gen_tok_per_s": 5.56,
+          "prefill_tok_per_s": 14.83,
+          "predicted_n": 27,
+          "prompt_n": 35,
+          "wall_s": 7.5,
+          "id": "primes",
+          "ok": true,
+          "tail": "ANSWER: 2, 3, 5, 7, 11, 13, 17"
+        },
+        {
+          "gen_tok_per_s": 5.48,
+          "prefill_tok_per_s": 16.19,
+          "predicted_n": 83,
+          "prompt_n": 72,
+          "wall_s": 19.92,
+          "id": "code_bal",
+          "ok": true,
+          "tail": "s:\n        if c in pairs:\n            if not stack or stack.pop() != pairs[c]: return False\n        elif c in pairs.values(): stack.append(c)\n    return not stack\n```\n\nANSWER: True"
+        },
+        {
+          "gen_tok_per_s": 5.52,
+          "prefill_tok_per_s": 15.22,
+          "predicted_n": 96,
+          "prompt_n": 40,
+          "wall_s": 20.39,
+          "id": "speed",
+          "ok": true,
+          "tail": "tecture achieves superior performance on complex tasks, offering a scalable and efficient alternative to dense transformer models in modern deep learning applications. ANSWER: done"
+        }
+      ],
+      "load_s": 15.0,
+      "vram_peak_mb": 3071
+    },
+    {
+      "cell": "auto_16k_q4",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 16384,
+        "KV_TYPE": "q4_0",
+        "USE_MMAP": "true",
+        "USE_MLOCK": "true",
+        "label": "auto_16k_q4"
+      },
+      "suite": "short",
+      "summary": {
+        "n_items": 3,
+        "n_pass": 3,
+        "mean_gen_tok_per_s": 5.48,
+        "max_gen_tok_per_s": 5.56,
+        "mean_prefill_tok_per_s": 15.4
+      },
+      "rows": [
+        {
+          "gen_tok_per_s": 5.56,
+          "prefill_tok_per_s": 14.87,
+          "predicted_n": 27,
+          "prompt_n": 35,
+          "wall_s": 7.49,
+          "id": "primes",
+          "ok": true,
+          "tail": "ANSWER: 2, 3, 5, 7, 11, 13, 17"
+        },
+        {
+          "gen_tok_per_s": 5.45,
+          "prefill_tok_per_s": 16.15,
+          "predicted_n": 83,
+          "prompt_n": 72,
+          "wall_s": 20.0,
+          "id": "code_bal",
+          "ok": true,
+          "tail": "s:\n        if c in pairs:\n            if not stack or stack.pop() != pairs[c]: return False\n        elif c in pairs.values(): stack.append(c)\n    return not stack\n```\n\nANSWER: True"
+        },
+        {
+          "gen_tok_per_s": 5.44,
+          "prefill_tok_per_s": 15.18,
+          "predicted_n": 96,
+          "prompt_n": 40,
+          "wall_s": 20.55,
+          "id": "speed",
+          "ok": true,
+          "tail": "tecture achieves superior performance on complex tasks, offering a scalable and efficient alternative to dense transformer models in modern deep learning applications. ANSWER: done"
+        }
+      ],
+      "load_s": 13.7,
+      "vram_peak_mb": 3187
+    },
+    {
+      "cell": "auto_4k_q8_no_mmap",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 4096,
+        "KV_TYPE": "q8_0",
+        "USE_MMAP": "false",
+        "USE_MLOCK": "true",
+        "label": "auto_4k_q8_no_mmap"
+      },
+      "suite": "short",
+      "summary": {
+        "n_items": 3,
+        "n_pass": 3,
+        "mean_gen_tok_per_s": 5.57,
+        "max_gen_tok_per_s": 5.71,
+        "mean_prefill_tok_per_s": 15.36
+      },
+      "rows": [
+        {
+          "gen_tok_per_s": 5.71,
+          "prefill_tok_per_s": 14.84,
+          "predicted_n": 27,
+          "prompt_n": 35,
+          "wall_s": 7.37,
+          "id": "primes",
+          "ok": true,
+          "tail": "ANSWER: 2, 3, 5, 7, 11, 13, 17"
+        },
+        {
+          "gen_tok_per_s": 5.54,
+          "prefill_tok_per_s": 16.11,
+          "predicted_n": 87,
+          "prompt_n": 72,
+          "wall_s": 20.52,
+          "id": "code_bal",
+          "ok": true,
+          "tail": "if c in pairs:\n            if not stack or stack.pop() != pairs[c]: return False\n        elif c in pairs.values():\n            stack.append(c)\n    return not stack\n```\nANSWER: True"
+        },
+        {
+          "gen_tok_per_s": 5.47,
+          "prefill_tok_per_s": 15.12,
+          "predicted_n": 96,
+          "prompt_n": 40,
+          "wall_s": 20.47,
+          "id": "speed",
+          "ok": true,
+          "tail": "ializing different experts for distinct features, the architecture achieves superior performance and efficiency in handling complex, diverse data patterns effectively. ANSWER: done"
+        }
+      ],
+      "load_s": 13.7,
+      "vram_peak_mb": 3063
+    }
+  ]
+}
