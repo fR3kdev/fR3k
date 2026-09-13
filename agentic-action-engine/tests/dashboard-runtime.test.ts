@@ -35,7 +35,7 @@ test('dashboard bridge runs actual Arga approvals independently and compares rec
     assert.equal(candidate.state.charges.get('CHG-88')!.refunded, false);
     const comparison = await bridge.compare(['baseline', 'candidate']);
     assert.equal(comparison.runs[0]!.score, 1);
-    assert.equal(comparison.runs[0]!.toolCalls, 4);
+    assert.equal(comparison.runs[0]!.toolCalls, 6);
     assert.equal(comparison.runs[0]!.policyViolations, 0);
     assert.equal(comparison.runs[0]!.unverifiedWrites, 0);
     assert.equal(comparison.runs[1]!.score, null);

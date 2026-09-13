@@ -5,7 +5,7 @@ import type { TestContext } from 'node:test';
 import { z } from 'zod';
 import { Runtime, type RuntimeOptions } from '../src/core/orchestrator.js';
 import type { Evaluator, Mission, Planner, PlannerContext } from '../src/core/types.js';
-import { ToolFault, ToolRegistry, type ToolMetadata } from '../src/tools/registry.js';
+import { ToolFault, ToolRegistry, type ToolDefinition, type ToolMetadata } from '../src/tools/registry.js';
 import { TraceStore } from '../src/trace/jsonl.js';
 import { MemoryStore } from '../src/memory/store.js';
 
@@ -19,6 +19,10 @@ export interface ScenarioOptions {
   planner?: Planner;
   evaluator?: Evaluator;
   runtimeOptions?: RuntimeOptions;
+  /** Swap the fixture read tool before registration (e.g. to simulate a hang or a deploy). */
+  overrideRead?: (def: ToolDefinition<{ id: string }, { id: string; value: string; source: string }>) => ToolDefinition<{ id: string }, { id: string; value: string; source: string }>;
+  /** Swap the fixture write tool before registration (e.g. to pin a contract variant). */
+  overrideWrite?: (def: ToolDefinition<{ id: string; value: string }, { accepted: boolean }>) => ToolDefinition<{ id: string; value: string }, { accepted: boolean }>;
 }
 
 export async function scenario(t: TestContext, options: ScenarioOptions = {}) {
@@ -28,7 +32,7 @@ export async function scenario(t: TestContext, options: ScenarioOptions = {}) {
     attempts: 0, keys: [] as string[], unknownVerification: options.unknownVerification ?? false };
   const applied = new Set<string>();
   const registry = new ToolRegistry();
-  registry.register({
+  const readDefinition: ToolDefinition<{ id: string }, { id: string; value: string; source: string }> = {
     name: 'records.read', description: 'Read a synthetic record', effect: 'read', autonomy: 0,
     environment: 'sandbox', reversible: true, blastRadius: 'None', idempotency: 'read-only', verificationMethod: 'Direct record read',
     input: z.strictObject({ id: z.string() }), output: z.strictObject({ id: z.string(), value: z.string(), source: z.string() }),
@@ -37,8 +41,8 @@ export async function scenario(t: TestContext, options: ScenarioOptions = {}) {
       if (state.reads <= (options.readFailures ?? 0)) throw new ToolFault('TRANSIENT');
       return { id: input.id, value: state.records.get(input.id) ?? 'missing', source: `fixture://records/${input.id}` };
     },
-  });
-  registry.register({
+  };
+  const writeDefinition: ToolDefinition<{ id: string; value: string }, { accepted: boolean }> = {
     name: 'records.write', description: 'Update exactly one synthetic record', effect: 'write', autonomy: options.autonomy ?? 2,
     environment: options.environment ?? 'sandbox', reversible: true, blastRadius: 'One synthetic record',
     idempotency: options.idempotency ?? 'provider-key', verificationMethod: 'Read exact record and idempotency marker',
@@ -65,7 +69,9 @@ export async function scenario(t: TestContext, options: ScenarioOptions = {}) {
       }
       return { status: 'absent', source };
     },
-  });
+  };
+  registry.register(options.overrideRead ? options.overrideRead(readDefinition) : readDefinition);
+  registry.register(options.overrideWrite ? options.overrideWrite(writeDefinition) : writeDefinition);
   const planner: Planner = options.planner ?? {
     id: 'fixture-planner-v1',
     async decide(context) {

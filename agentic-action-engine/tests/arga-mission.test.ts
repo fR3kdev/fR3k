@@ -27,8 +27,16 @@ test('Arga mission crosses three sandbox apps with exact approvals and read-back
   view = await demo.runtime.run('arga-test');
   assert.equal(view.status, 'CONFIRMED_SUCCESS');
   assert.equal(view.evaluation?.passed, true);
-  assert.deepEqual(view.evaluation?.checks.map(check => check.passed), [true, true, true, true, true, true, true]);
+  assert.deepEqual(view.evaluation?.checks.map(check => check.passed), [true, true, true, true, true, true, true, true]);
   assert.ok(view.events.some(event => event.kind === 'approval.granted'));
   assert.equal(new Set(view.events.filter(event => event.kind === 'tool.result').map(event => event.data.label)).size, 1);
   assert.equal(view.events.find(event => event.kind === 'tool.result')?.data.label, 'SIMULATION_ONLY');
+  assert.equal(demo.state.refunds.size, 1);
+  const refund = [...demo.state.refunds.values()][0]!;
+  assert.equal(refund.chargeId, 'CHG-88');
+  assert.equal(refund.amount, 499);
+  assert.equal(refund.currency, 'USD');
+  assert.equal(refund.customerId, 'CUS-7');
+  assert.equal(demo.state.charges.get('CHG-89')?.refunded, false);
+  assert.equal([...demo.state.refunds.values()].some(record => record.chargeId === 'CHG-89'), false);
 });
