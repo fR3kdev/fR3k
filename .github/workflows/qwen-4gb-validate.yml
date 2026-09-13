@@ -1,0 +1,16 @@
+name: validate-qwen-4gb-kit
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m py_compile qwen-35b-on-4gb/harness/*.py
+      - run: python qwen-35b-on-4gb/harness/bench_ollama.py --help >/dev/null
+      - run: python qwen-35b-on-4gb/harness/sweep_ollama.py --help >/dev/null
+      - run: python -m json.tool qwen-35b-on-4gb/configs/workstation.json >/dev/null
+      - run: python -m json.tool qwen-35b-on-4gb/configs/workstation.grid.json >/dev/null
+      - run: python -m json.tool qwen-35b-on-4gb/results/workstation_20260506_033245.json >/dev/null
