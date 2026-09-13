@@ -235,4 +235,6 @@ See `PLAN.md` for Lemma, Comma Capital, Arga Labs adversarial variants and Userl
 
 ## 10. Publication record
 
-Implementation is committed locally through `81f034e`, preceded by connector `9d46a36` and dashboard `a220838`. The handover commit and remote verification are recorded by the finishing agent below. Consult the actual branch and Actions runs if this snapshot has aged.
+Implementation was published to `origin/main`, including connector `9d46a36`, dashboard `a220838`, integration `81f034e` and handover `dc2b222`. Another writer updated the livestream links during development; those commits (`96f3706`, `7867199`) were preserved with merge `f3553d9`, with no force push. `git ls-remote` confirmed `origin/main` at `f3553d96661bff4836b2ab1f5f7d5febff584ad8` after publication; the working tree was clean. This publication-record update follows that merge.
+
+Local checks passed as recorded above. New GitHub CI results were not yet observed when this publication record was written. Inspect https://github.com/fR3kdev/fR3k/actions for `validate-agent-runtime` and `validate-qwen-4gb-kit` on the current commit. Do not mistake earlier successful Qwen-only checks for runtime validation.
