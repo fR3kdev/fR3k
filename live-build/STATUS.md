@@ -18,15 +18,15 @@
 | Independent evaluator | 🟨 PARTIALLY_VERIFIED | local final-state, trajectory, evidence and bounded-replanning tests pass |
 | Replay / counterfactual runner | ⏳ BUILDING | contract defined, implementation pending |
 | Arga three-app sandbox mission | 🟨 PARTIALLY_VERIFIED | runnable Support Desk → Billing → CRM vertical slice; all evidence is `SIMULATION_ONLY` |
-| GitHub connector | ⏳ BUILDING | live repo operations work; contest runtime adapter pending |
+| GitHub connector | 🟨 PARTIALLY_VERIFIED | issue read and evidence comment adapters; 14 contract tests pass; live runtime verification pending |
 | App capability inventory | 🟨 PARTIALLY_VERIFIED | GitHub access observed; Google access unavailable; live 3-app selection remains gated |
 | Gmail / Calendar route | ❌ REJECTED | do not authenticate or implement |
-| Live dashboard | ⬜ NOT TESTED | planned after runtime core |
+| Live dashboard | 🟨 PARTIALLY_VERIFIED | loopback UI wired to actual Arga runtime; API and Chromium checks pass; external-app evidence pending |
 | End-to-end 3+ app mission | ⬜ NOT TESTED | must be proven before demo |
 
 ## Build priority
 
-The [completion ledger](COMPLETION.md) records current test evidence and remaining integration gates. Local runtime tests are in [`runtime.behavior.test.ts`](../agentic-action-engine/tests/runtime.behavior.test.ts). The isolated [connector](DEVELOPMENT_PATHWAY_CONNECTORS.md) and [dashboard](DEVELOPMENT_PATHWAY_DASHBOARD.md) briefs are ready for separate development agents.
+The [completion ledger](COMPLETION.md) records current test evidence and remaining integration gates. Local runtime tests are in [`runtime.behavior.test.ts`](../agentic-action-engine/tests/runtime.behavior.test.ts). The two jobs ran concurrently from baseline `ab2be86`; the active GitHub-only scope is in [the directive](HACKATHON_DIRECTIVE.md). Connector details are in [CONNECTORS.md](../agentic-action-engine/docs/CONNECTORS.md).
 
 ### P0 — make one mission work end to end
 
@@ -36,7 +36,7 @@ The [completion ledger](COMPLETION.md) records current test evidence and remaini
 - [x] autonomy / policy gate
 - [x] trace writer
 - [x] evaluator
-- [ ] GitHub adapter
+- [x] GitHub adapter (contract-tested; live runtime gate pending)
 - [ ] Google Workspace adapter(s)
 - [x] approval checkpoint
 - [x] read-after-write verification

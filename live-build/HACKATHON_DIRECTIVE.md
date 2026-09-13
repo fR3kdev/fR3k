@@ -63,3 +63,14 @@ The mission is now recorded. Implementation may proceed on this vertical slice a
 ## Completion evidence
 
 A task is complete only when the repository records the commit, tests actually run, live app read/write/read-back evidence where applicable, known limitations and exact demo steps.
+
+## Concurrent delivery scope — 2026-09-14
+
+The user requested both development jobs concurrently, integrated to `main`.
+The shared baseline is `ab2be86`. Jobs use isolated Git worktrees because the runtime is now committed.
+
+- Connectors: implement the observed GitHub capability only (`github.read_issue` and `github.write_evidence`), with injected credentials, repository allowlists, exact read-back and reconciliation tests. This is supporting infrastructure; no live three-app workflow or external write is authorized by this implementation assignment.
+- Dashboard: implement the local mission and exact-action approval interface, then connect it to the existing Arga runtime. The host supplies operator identity; approval and resume remain separate operations.
+- Main integration: run combined tests, typecheck and sandbox demo, add runtime CI, review and publish both deliveries to `main`.
+
+Acceptance is contract-tested GitHub adapters plus a browser-verified dashboard operating the real sandbox runtime. Live external-app verification, checkpoint replay and process-crash recovery remain separate gates. Gmail and Calendar remain excluded.

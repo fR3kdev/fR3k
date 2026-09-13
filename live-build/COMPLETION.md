@@ -25,7 +25,7 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 
 - [Pathway 1: live app connectors](DEVELOPMENT_PATHWAY_CONNECTORS.md) owns `src/connectors/` and its own tests/documentation.
 - [Pathway 2: dashboard](DEVELOPMENT_PATHWAY_DASHBOARD.md) owns `src/dashboard/` and its own tests/documentation.
-- The main agent owns core integration, reliability, memory/replay, all domain scenarios, shared configuration and final verification. The briefs are saved; no separate agents have been started by this session.
+- Two agents were started concurrently from committed baseline `ab2be86`: GitHub-only adapters and dashboard. The main agent owns integration, shared configuration and combined verification. The old Google connector scope remains superseded.
 
 ## Latest local verification — 2026-09-14
 
@@ -42,3 +42,14 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 - No external messages are sent without approval of the concrete recipient and content.
 - Existing unrelated workloads are left alone unless they demonstrably interfere; this agent's work is focused on this project.
 - No production or live-integration completion claim is supported by synthetic fixtures alone.
+
+## Concurrent delivery verification — 2026-09-14
+
+- GitHub-only connector code integrated as `9d46a36` (agent delivery `5c0f077`). Fourteen contract tests pass; no live comment was sent.
+- Dashboard code integrated as `a220838` (agent delivery `caba00e`). Two API tests cover multiple authorization, validation and asynchronous operation cases.
+- Main integration adds the actual Arga runtime bridge, `npm run dashboard`, one end-to-end bridge test, and `validate-agent-runtime` CI.
+- Combined `npm test`: **46 passed, 0 failed**. `npm run typecheck` and `npm run demo` passed; sandbox evaluator score **1.00**.
+- Chromium acceptance passed for actual runtime keyboard approval/denial, separate resume, successful and denied runs, comparison, updated run-list statuses, and 390px mobile layout. No page JavaScript errors.
+- Fixture screenshots: `/tmp/fr3k-dashboard-evidence/`; actual-runtime screenshots: `/tmp/fr3k-dashboard-runtime-desktop.png`, `/tmp/fr3k-dashboard-runtime-mobile.png`. These are local, ephemeral evidence artifacts.
+- `npm run dashboard` always creates new in-memory sandbox app state. It retains traces, but does not support restarting old missions against recovered app state.
+- Three live external apps, durable recovery, checkpoint replay, a model-driven planner and the full adversarial scenario set remain unfinished. See [the current developer handover](DEVELOPER_HANDOVER.md).

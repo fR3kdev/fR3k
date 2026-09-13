@@ -6,7 +6,8 @@
   "scripts": {
     "demo": "tsx src/cli.ts",
     "test": "node --import tsx --test tests/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dashboard": "tsx src/demo/dashboard-cli.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

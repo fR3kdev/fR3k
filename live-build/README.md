@@ -12,7 +12,7 @@
 
 For a plain-language explanation of the files and project, read [the project synopsis](SYNOPSIS.md).
 
-The former Gmail/Google connector brief is superseded and must not be executed. The [mission dashboard brief](DEVELOPMENT_PATHWAY_DASHBOARD.md) remains usable only when it directly advances the judged demo. The [completion ledger](COMPLETION.md) tracks verified state.
+The former Gmail/Google connector brief is superseded; the active GitHub-only scope is recorded in the directive. The [mission dashboard brief](DEVELOPMENT_PATHWAY_DASHBOARD.md) remains usable only when it directly advances the judged demo. The [completion ledger](COMPLETION.md) tracks verified state.
 
 Read the [senior developer handoff manifest](HANDOFF_MANIFEST.md) for the checkout, current code, test evidence and known issues.
 
@@ -27,6 +27,21 @@ Core loop:
 The point is not to produce clever text. The point is to change state across real tools, verify the change, and leave receipts.
 
 The first runnable vertical slice is the Arga Labs duplicate-charge mission: Support Desk → Billing → CRM. Run it with `cd agentic-action-engine && npm run demo`. It is a production-shaped local sandbox and every observation is explicitly labelled `SIMULATION_ONLY`; live external-app verification remains pending.
+
+### Run the operator dashboard
+
+```bash
+cd agentic-action-engine
+npm ci
+npm run dashboard
+```
+
+Open the printed loopback URL. Select either independent Arga run and choose Resume.
+Inspect the exact refund, approve it, then choose Resume separately. Repeat for the CRM update.
+Compare runs after approving one and denying the other to inspect their recorded outcomes.
+Both runs use the same planner; this is run comparison, not checkpoint replay or a model improvement claim.
+The dashboard drives the real runtime with synthetic app state (`SIMULATION_ONLY`).
+Each launch creates fresh runs and retains their trace directory; restarting does not recover the in-memory app state.
 
 ## Four worlds, one engine
 
