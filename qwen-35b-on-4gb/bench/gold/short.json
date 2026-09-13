@@ -1,0 +1,24 @@
+{
+  "suite": "short",
+  "description": "Fast probes — minimum prompts to measure cold-gen tps + correctness.",
+  "items": [
+    {
+      "id": "primes",
+      "prompt": "List the first 7 prime numbers, comma separated. Reply with just one line: ANSWER: <numbers>",
+      "gold": ["2, 3, 5, 7, 11, 13, 17", "2,3,5,7,11,13,17"],
+      "max_tokens": 60
+    },
+    {
+      "id": "code_bal",
+      "prompt": "Write a 3-line Python function is_balanced(s) that returns True iff all (), [], {} are balanced and properly nested in s. Then state ANSWER: True if is_balanced('a(b[c]{d}e)f') is True, else ANSWER: False. Be concise.",
+      "gold": ["ANSWER: True", "ANSWER:True"],
+      "max_tokens": 200
+    },
+    {
+      "id": "speed",
+      "prompt": "Write exactly one paragraph (about 80 words) describing the architecture of a mixture-of-experts transformer. End with ANSWER: done",
+      "gold": ["done"],
+      "max_tokens": 200
+    }
+  ]
+}
