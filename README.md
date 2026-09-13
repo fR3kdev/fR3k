@@ -1,5 +1,7 @@
 # fR3k Open Code Drop
 
+> ⚠️ **STREAM STATUS:** Magnetic Island Wi-Fi has gone sideways. The live stream will be back up ASAP — the build is still moving.
+
 [![LIVE](https://img.shields.io/badge/🔴_LIVE-YOUTUBE-ff1744?style=for-the-badge)](https://youtube.com/live/eY0ChQGaEe0?si=ihuGARaRKP5ENoDZ)
 ![Open Source](https://img.shields.io/badge/OPEN-SOURCE-5BE7FF?style=for-the-badge&labelColor=08101f)
 ![Built in Public](https://img.shields.io/badge/BUILT-IN_PUBLIC-9C5CFF?style=for-the-badge&labelColor=08101f)
