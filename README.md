@@ -1,8 +1,8 @@
 # fR3k Open Code Drop
 
-> 🟢 **STREAM STATUS:** Back online — [watch the build live](https://youtube.com/live/eY0ChQGaEe0?si=ihuGARaRKP5ENoDZ).
+> 🟢 **STREAM STATUS:** Back online — [watch the build live](https://youtube.com/live/xKOL36Yjs0U?feature=share).
 
-[![LIVE](https://img.shields.io/badge/🔴_LIVE-YOUTUBE-ff1744?style=for-the-badge)](https://youtube.com/live/eY0ChQGaEe0?si=ihuGARaRKP5ENoDZ)
+[![LIVE](https://img.shields.io/badge/🔴_LIVE-YOUTUBE-ff1744?style=for-the-badge)](https://youtube.com/live/xKOL36Yjs0U?feature=share)
 ![Open Source](https://img.shields.io/badge/OPEN-SOURCE-5BE7FF?style=for-the-badge&labelColor=08101f)
 ![Built in Public](https://img.shields.io/badge/BUILT-IN_PUBLIC-9C5CFF?style=for-the-badge&labelColor=08101f)
 
@@ -84,7 +84,7 @@ This repo is for things worth handing to another builder, not pitch-deck confett
 
 I’m building and breaking things publicly during the Multi-App AI Agent Hackathon.
 
-**Watch:** https://youtube.com/live/eY0ChQGaEe0?si=ihuGARaRKP5ENoDZ
+**Watch:** https://youtube.com/live/xKOL36Yjs0U?feature=share
 
 If you’re in the competition: **good luck. Steal anything useful from here.** That is literally why this repo exists.
 
