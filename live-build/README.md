@@ -12,7 +12,7 @@
 
 For a plain-language explanation of the files and project, read [the project synopsis](SYNOPSIS.md).
 
-The former Gmail/Google connector brief is superseded; the active GitHub-only scope is recorded in the directive. The [mission dashboard brief](DEVELOPMENT_PATHWAY_DASHBOARD.md) remains usable only when it directly advances the judged demo. The [completion ledger](COMPLETION.md) tracks verified state.
+The former Gmail/Google connector brief is superseded. The current judged path uses YouTube, GitHub and ntfy, as recorded in the directive; GitHub-only work was an earlier delivery scope. The [mission dashboard brief](DEVELOPMENT_PATHWAY_DASHBOARD.md) remains usable only when it directly advances the judged demo. The [completion ledger](COMPLETION.md) tracks verified state.
 
 Read the [current developer handover](DEVELOPER_HANDOVER.md) for delivered commits, reproduction commands, verification evidence and the remaining implementation work. The [earlier handoff manifest](HANDOFF_MANIFEST.md) is historical.
 
@@ -27,6 +27,8 @@ Core loop:
 The point is not to produce clever text. The point is to change state across real tools, verify the change, and leave receipts.
 
 The judged live slice is now **YouTube → GitHub → ntfy → GitHub evidence**. `npm run demo:live` reads the real stream and canonical issue, gates both external writes behind exact operator approval, performs read-after-write verification, and leaves a hash-chained trace. The verified run reached **`CONFIRMED_SUCCESS` with evaluator score 1.00**. Arga Support Desk → Billing → CRM remains the hardened `SIMULATION_ONLY` regression fixture behind `npm run demo`.
+
+For prerequisites, credentials and the distinction between `demo-live` and `demo:live`, see the [runtime guide](../agentic-action-engine/README.md).
 
 ### Run the operator dashboard
 
@@ -52,11 +54,11 @@ Each launch creates fresh runs and retains their trace directory; restarting doe
 | **Arga Labs** | reproduce agent failures in production-shaped sandboxes and turn them into regression gates | failure → sandbox twin → mutations → replay → CI guardrail |
 | **Userlens** | choose bounded customer interventions from behavioral evidence and measure whether they worked | behavior → treatment → outcome → uplift/policy update |
 
-Full version: [`PLAN.md`](PLAN.md)
+Arga is implemented as a sandbox; Lemma, Comma Capital and Userlens remain planned extensions. Full version: [`PLAN.md`](PLAN.md)
 
 ## Shared runtime
 
-The same primitives drive all four worlds:
+The shared runtime provides the foundation for these worlds:
 
 - **Entity** — thing being reasoned about
 - **State** — grounded facts, not model vibes

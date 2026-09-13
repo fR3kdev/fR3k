@@ -19,7 +19,7 @@ This is the judge-facing submission bundle for the Multi-App AI Agent Hackathon.
 
 The agent reads the exact YouTube live-stream state, grounds the task against GitHub issue #1, pauses for exact approval, writes one bounded operator notification through ntfy, verifies the external receipt, then writes the verified evidence back to GitHub and reads that comment back exactly.
 
-The verified live run reached **`CONFIRMED_SUCCESS`**, evaluator **1.00**, **7/7 checks passed**. The rendered video shows **77/77**, which was the green count at render time; current `main` adds three follow-up hardening tests and passes **80/80**. The repository integration suite passed **80 tests** with **0 failures**, and GitHub Actions was green on the submission commit.
+The verified live run reached **`CONFIRMED_SUCCESS`**, evaluator **1.00**, **7/7 checks passed**. The rendered video shows **77/77**, which was the green count at render time; submission baseline `f488f55` includes three follow-up hardening tests and passes **80/80**. The repository integration suite passed **80 tests** with **0 failures**, and GitHub Actions was green on the submission commit.
 
 ## Public receipts
 

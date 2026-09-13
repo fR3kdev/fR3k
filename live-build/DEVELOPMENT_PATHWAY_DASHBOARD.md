@@ -1,5 +1,7 @@
 # Development pathway 2 — Mission dashboard and approval UI
 
+> **HISTORICAL ASSIGNMENT — delivered and integrated.** Checkout assumptions and remaining work below reflect the original brief. Use [the developer handover](DEVELOPER_HANDOVER.md) and [dashboard documentation](../agentic-action-engine/docs/DASHBOARD.md) for current contracts and limitations.
+
 ## Mission and ownership
 
 Build a local dashboard that lets a person see what the agent is doing, inspect its evidence, approve or deny an exact action, and compare replay results. The main agent owns the runtime, domain logic, evaluation, replay, CLI integration and shared configuration. The other delegated pathway owns live connectors.

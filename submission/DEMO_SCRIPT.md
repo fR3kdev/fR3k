@@ -1,5 +1,7 @@
 # Two-minute Demo Script
 
+This is the script for the published video. Its 77-test closing line records the render-time result; the submission baseline later passed 80 tests. See [the submission README](README.md).
+
 **0:00–0:15 — Hook**  
 A real livestream failure became the demo. fR3k is an agent that acts across apps, then proves each action happened.
 

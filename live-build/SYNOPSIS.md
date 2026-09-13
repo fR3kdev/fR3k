@@ -31,33 +31,27 @@ This synopsis is a plain-language guide to those documents. The status board rem
 | **Arga Labs** | Reproduce enterprise-agent failures in a sandbox and turn them into repeatable tests. | A reproduced failure, replay comparisons, and a regression gate that detects the problem. |
 | **Userlens** | Choose customer-adoption interventions from observed product usage and measure their effect. | Outcomes compared with a baseline or control group, informing later intervention choices. |
 
-These use cases share the execution machinery. Each supplies its own data, tools, rules, memory, and success checks. The planned core runtime uses TypeScript; Python is reserved for analysis or evaluation where it adds value.
+These use cases share the execution machinery. Each supplies its own data, tools, rules, memory, and success checks. The implemented core runtime uses TypeScript; Python is reserved for analysis or evaluation where it adds value.
 
-## The first working milestone
+## The verified live mission
 
-The first target is one complete mission across **at least three necessary external apps**, selected from verified authenticated capabilities. The former Gmail/calendar route was rejected; see [HACKATHON_DIRECTIVE.md](HACKATHON_DIRECTIVE.md).
+The judged workflow is **YouTube → GitHub → ntfy → GitHub evidence**:
 
-The final app roles will be recorded only after the capability inventory and demo decision. Each selected app must contribute an observable, verifiable step to the same useful workflow.
+1. Read the exact YouTube stream state.
+2. Read the canonical GitHub incident issue.
+3. Propose an operator notification and require exact approval.
+4. Publish through ntfy and read back the matching receipt.
+5. Require a second exact approval, append evidence to GitHub, and read the comment back.
+6. Independently evaluate the outcome and retain the execution trace.
 
-### Example intended workflow
-
-This example describes planned behavior, not a demonstrated working integration:
-
-1. A GitHub issue describes a founder's sales bottleneck.
-2. The agent reads company context and potential helpers from Sheets or Drive.
-3. It explains the bottleneck, ranks suitable helpers, and prepares an introduction.
-4. A policy checkpoint requires human approval before sending.
-5. After approval, the agent sends through Gmail and reads back the sent message to verify the action.
-6. The evaluator checks the mission's criteria, and the trace records the decisions, approval, action, and result.
-
-Verifying a sent introduction proves the communication action occurred. Acceptance and improvement in the founder's business require later observations; sending alone does not prove those outcomes.
-
-The first milestone is complete when the mission runs across the apps, respects approval, verifies external state, produces an independent verdict, and leaves a trace that supports replay comparison. Expansion to all four use cases follows this foundation.
+Run `live-incident-1789331116305` completed on 2026-09-14 with `CONFIRMED_SUCCESS`, score **1.00**, and **7/7 checks passed**. The [evidence record](evidence/LIVE_MISSION_2026-09-14.md) also documents delayed ntfy receipt visibility and verifier-only reconciliation without a duplicate notification. The earlier Gmail/calendar route is rejected; see [HACKATHON_DIRECTIVE.md](HACKATHON_DIRECTIVE.md).
 
 ## Current state and repository context
 
-As of **2026-09-14**, the published `live-build/` workspace contains the project documentation. Its status board marks the runtime, policy engine, trace, evaluator, replay, and GitHub runtime adapter as **BUILDING**. Google integrations, the dashboard, and the complete three-app mission are **NOT TESTED**. These labels do not establish that a working agent has been demonstrated.
+At submission baseline `f488f55`, the published engine includes typed tools, policy and exact approvals, hash-chained traces, independent evaluation, durable outcome memory, Arga replay, eight adversarial variants, and the live three-app mission. The integration suite passes **80 tests**; the historical mission/video snapshot reports **77** before subsequent hardening tests.
 
-The next implementation priorities are the core runtime, typed tools, permission checks, trace recording, evaluation, and one verified external-app workflow. Reliability scenarios and replay comparisons follow, then the dashboard and additional domain scenarios. See [STATUS.md](STATUS.md) for the detailed checklist.
+The local dashboard controls the Arga sandbox and is browser-verified there. Live-provider dashboard control, measured confidence/cost/latency, and a verified model-backed planner run remain open. The shipped demos use deterministic planners; the bounded model-provider interface requires explicit host wiring. Lemma, Comma Capital and Userlens remain planned domain extensions. See [STATUS.md](STATUS.md) and [COMPLETION.md](COMPLETION.md) for scope and evidence.
 
-The wider repository is a public code collection. Its [Qwen benchmark kit](../qwen-35b-on-4gb/README.md) and [cost router](../router.py) are separate existing code drops; they are not evidence that the live-build agent engine is implemented. The [root README](../README.md) explains that broader context.
+Start with the [runtime guide](../agentic-action-engine/README.md) for installation and commands, or the [submission bundle](../submission/README.md) for the video and brief.
+
+The wider repository is a public code collection. Its [Qwen benchmark kit](../qwen-35b-on-4gb/README.md) and [cost router](../router.py) are separate code drops. The [root README](../README.md) explains that broader context.

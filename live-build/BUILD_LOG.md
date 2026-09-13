@@ -4,6 +4,15 @@ This is the watcher-facing record of what changed during the live build.
 
 It is intentionally plain: timestamp / change / evidence / next move.
 
+Entries are historical snapshots, including their test counts and then-current next steps. For current scope and verification, read [STATUS.md](STATUS.md) and [COMPLETION.md](COMPLETION.md).
+
+## 2026-09-14 — documentation reconciliation
+
+- Aligned the synopsis, status, completion ledger, architecture and handover with the published YouTube → GitHub → ntfy mission; labeled earlier assignments and verification snapshots as historical.
+- Added the runtime command/configuration guide, including the distinct read-only and write-capable launchers, actual token resolution, approval behavior, deterministic-planner boundary and sandbox dashboard scope.
+- Corrected Qwen reproduction commands, references to absent files, and benchmark interpretations unsupported by the retained sweep. Replaced obsolete `.env.example` guidance and unsupported router/pricing docstring claims.
+- Verification against submission baseline `f488f55`: clean `npm ci`, **80/80 tests**, typecheck, sandbox demo, and all relative Markdown link targets passed. The recorded live run and video keep their original 77-test snapshot. No live app actions were repeated.
+
 ---
 
 ## 2026-09-14 — gap-fill: durable outcomes, bounded model planner, adversarial variants, live GitHub attach

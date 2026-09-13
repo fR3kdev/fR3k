@@ -1,6 +1,10 @@
-# GitHub adapters
+# Live app connectors
 
-Status: **contract-tested; live read runtime verification passed via the operator token**. These supplementary adapters do not replace the recorded Arga Labs sandbox mission and do not demonstrate three external apps. A live read-only attach (`npm run demo-live`) reached `CONFIRMED_SUCCESS` with all GitHub observations `VERIFIED`; live *writes* remain operator-gated and none were performed. No Google, Gmail or Calendar adapters are included.
+Status: **contract-tested, with a recorded live three-app mission**. `npm run demo:live` uses YouTube, GitHub and ntfy; the [2026-09-14 evidence record](../../live-build/evidence/LIVE_MISSION_2026-09-14.md) documents both approved writes and exact read-back. The separate `npm run demo-live` launcher only reads GitHub. No Google, Gmail or Calendar adapters are included.
+
+See the [runtime command and configuration guide](../README.md) for credentials, targets and approval behavior. The Arga demo and dashboard remain `SIMULATION_ONLY`.
+
+## GitHub issue and evidence adapters
 
 `registerLiveConnectors(registry, options)` in `src/connectors/index.ts` registers:
 
@@ -17,7 +21,20 @@ A write appends a SHA-256 correlation marker derived from the runtime idempotenc
 
 Empty lists, changed content, duplicate markers, verification errors and uncertain side effects return `unknown`, never proven absence. A lost POST response, malformed successful write response, or server error produces `UNCERTAIN`; no automatic write retry occurs. Reads classify transport failures as `UNAVAILABLE`, server/rate errors as `TRANSIENT`, and rejected requests as `REJECTED`. Provider error bodies and credential callback errors are discarded. Authentication must be configured through the host, not pasted into tool arguments.
 
-## Validation and live gate
+## YouTube and ntfy adapters
+
+`registerIncidentConnectors(registry, options)` in `src/connectors/incident.ts` takes exact `allowedYoutubeVideoIds` and `allowedNtfyTopics` allowlists, optional injected `fetch`, and an optional `ntfyOrigin` (default `https://ntfy.sh`).
+
+| Tool | Input | Output | Policy |
+| --- | --- | --- | --- |
+| `youtube.read_live_state` | `videoId` | exact video ID, title, live flags, source URL | live read, autonomy 0 |
+| `ntfy.publish_status` | `topic`, `title`, `message` | event ID, source URL, sent timestamp | live write, autonomy 2, reconcile-only |
+
+YouTube state comes from public watch-page player metadata with exact video identity checks. The live mission evaluator requires `isLiveNow=true`; the dated successful run does not guarantee that the same video is live on a later launch.
+
+The ntfy write appends a correlation marker. Its verifier polls the exact topic up to four times, with 250/500/750 ms waits between attempts, and requires a unique exact topic/title/message match plus the returned event ID when available. Duplicate exact matches, a matching event with the wrong returned ID, and transport/parse errors yield `unknown`; no exact match after all polls yields `absent`. Reconcile-only semantics prevent an automatic resend. The recorded mission recovered from delayed visibility by reconciling the original receipt without executing another write.
+
+## Validation and live operation
 
 From `agentic-action-engine/`:
 
@@ -27,7 +44,7 @@ node --import tsx --test tests/connectors.*.test.ts
 npm run typecheck
 ```
 
-Tests use synthetic inline fixtures and the real ToolRegistry. They exercise allowlisting, schema and resource checks, sanitized errors, cancellation, pagination, exact readback, duplicate markers, lost responses and uncertain verification. Live operation still needs a host wiring these adapters into an approved mission, configured credentials/allowlist, an authenticated read, an exact approved test comment, and captured POST/readback runtime evidence.
+Tests use synthetic inline fixtures and the real ToolRegistry. They exercise allowlisting, schema and resource checks, sanitized errors, cancellation, pagination, exact readback, duplicate markers, lost responses and uncertain verification. The shipped `createLiveIncidentMission` host wires these adapters into the approved three-app flow. That path has recorded POST/read-back evidence; a new run still needs its own configured credentials, exact resource allowlists and write approvals.
 
 An operator can perform a read-only credential/resource preflight (replace the explicit example repository and issue with the approved target):
 

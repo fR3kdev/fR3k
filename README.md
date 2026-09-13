@@ -1,6 +1,6 @@
 # fR3k Open Code Drop
 
-> 🟢 **STREAM STATUS:** Back online — [watch the build live](https://youtube.com/live/xKOL36Yjs0U?feature=share).
+> **Build stream:** [Watch the stream or recording](https://youtube.com/live/xKOL36Yjs0U?feature=share). The verified live-state observation is dated in the mission evidence below.
 
 [![LIVE](https://img.shields.io/badge/🔴_LIVE-YOUTUBE-ff1744?style=for-the-badge)](https://youtube.com/live/xKOL36Yjs0U?feature=share)
 ![Open Source](https://img.shields.io/badge/OPEN-SOURCE-5BE7FF?style=for-the-badge&labelColor=08101f)
@@ -29,10 +29,10 @@ cd agentic-action-engine
 npm ci
 npm run typecheck
 npm test
-npm run demo:live
+npm run demo
 ```
 
-`demo:live` performs real external writes only after the exact action is approved.
+This runs the Arga sandbox demo. For the real three-app mission, follow the [runtime setup and command guide](agentic-action-engine/README.md), then run `npm run demo:live`. The live launcher requires GitHub credentials and a currently live YouTube video; its default interactive flow asks for each write approval.
 
 ## Useful code. Strange experiments. No velvet rope.
 
@@ -40,7 +40,7 @@ This is the public **fR3k code drop**: runnable things I actually find useful, i
 
 If something here helps your build, take it. Fork it. Break it. Make it faster. Make it weirder. Ship it.
 
-> **Current headline drop:** a reproducible **35B-A3B Qwen run on a machine with 4 GB VRAM**.
+> **Local-model experiment:** a reproducible **35B-A3B Qwen run on a machine with 4 GB VRAM**.
 
 ## 👁 Watch the hackathon build evolve
 
