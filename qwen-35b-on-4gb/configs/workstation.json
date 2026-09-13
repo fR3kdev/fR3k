@@ -1,0 +1,107 @@
+{
+  "rig": "workstation",
+  "winner_label": "auto_4k_q8_no_mmap",
+  "config": {
+    "NUM_GPU": -1,
+    "NUM_CTX": 4096,
+    "KV_TYPE": "q8_0",
+    "USE_MMAP": "false",
+    "USE_MLOCK": "true",
+    "label": "auto_4k_q8_no_mmap"
+  },
+  "metrics": {
+    "max_gen_tok_per_s": 5.71,
+    "mean_gen_tok_per_s": 5.57,
+    "mean_prefill_tok_per_s": 15.36,
+    "vram_peak_mb": 3063,
+    "load_s": 13.7,
+    "correctness": "3/3 on short suite (primes, code_balance, mol_writeup)"
+  },
+  "ranked": [
+    {
+      "label": "auto_4k_q8_no_mmap",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 4096,
+        "KV_TYPE": "q8_0",
+        "USE_MMAP": "false",
+        "USE_MLOCK": "true",
+        "label": "auto_4k_q8_no_mmap"
+      },
+      "max_tps": 5.71,
+      "mean_tps": 5.57,
+      "prefill_tps": 15.36,
+      "pass": "3/3",
+      "vram_peak_mb": 3063,
+      "load_s": 13.7
+    },
+    {
+      "label": "auto_4k_q8",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 4096,
+        "KV_TYPE": "q8_0",
+        "USE_MMAP": "true",
+        "USE_MLOCK": "true",
+        "label": "auto_4k_q8"
+      },
+      "max_tps": 5.59,
+      "mean_tps": 5.47,
+      "prefill_tps": 15.37,
+      "pass": "3/3",
+      "vram_peak_mb": 3367,
+      "load_s": 94.2
+    },
+    {
+      "label": "auto_8k_q4",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 8192,
+        "KV_TYPE": "q4_0",
+        "USE_MMAP": "true",
+        "USE_MLOCK": "true",
+        "label": "auto_8k_q4"
+      },
+      "max_tps": 5.56,
+      "mean_tps": 5.52,
+      "prefill_tps": 15.41,
+      "pass": "3/3",
+      "vram_peak_mb": 3071,
+      "load_s": 15.0
+    },
+    {
+      "label": "auto_16k_q4",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 16384,
+        "KV_TYPE": "q4_0",
+        "USE_MMAP": "true",
+        "USE_MLOCK": "true",
+        "label": "auto_16k_q4"
+      },
+      "max_tps": 5.56,
+      "mean_tps": 5.48,
+      "prefill_tps": 15.4,
+      "pass": "3/3",
+      "vram_peak_mb": 3187,
+      "load_s": 13.7
+    },
+    {
+      "label": "auto_4k_q4",
+      "config": {
+        "NUM_GPU": -1,
+        "NUM_CTX": 4096,
+        "KV_TYPE": "q4_0",
+        "USE_MMAP": "true",
+        "USE_MLOCK": "true",
+        "label": "auto_4k_q4"
+      },
+      "max_tps": 5.37,
+      "mean_tps": 5.35,
+      "prefill_tps": 15.11,
+      "pass": "3/3",
+      "vram_peak_mb": 3059,
+      "load_s": 15.1
+    }
+  ]
+}
