@@ -248,6 +248,6 @@ See `PLAN.md` for Lemma, Comma Capital, Arga Labs adversarial variants and Userl
 
 ## 10. Publication record
 
-Implementation was published to `origin/main`, including connector `9d46a36`, dashboard `a220838`, integration `81f034e` and handover `dc2b222`. Another writer updated the livestream links during development; those commits (`96f3706`, `7867199`) were preserved with merge `f3553d9`, with no force push. `git ls-remote` confirmed `origin/main` at `f3553d96661bff4836b2ab1f5f7d5febff584ad8` after publication; the working tree was clean. This publication-record update follows that merge.
+Implementation was published to `origin/main`, including connector `9d46a36`, dashboard `a220838`, integration `81f034e`, handover `dc2b222`, and the gap-fill batch `7fb5b77`/`f6bfff4` (crash recovery + replay) followed by `dc647ad` (durable outcomes, bounded model planner, adversarial variants, live GitHub attach). Another writer updated the livestream links during development; those commits (`96f3706`, `7867199`) were preserved with merge `f3553d9`, with no force push. `git ls-remote` confirmed `origin/main` after publication; the working tree was clean.
 
 Local checks passed as recorded above. New GitHub CI results were not yet observed when this publication record was written. Inspect https://github.com/fR3kdev/fR3k/actions for `validate-agent-runtime` and `validate-qwen-4gb-kit` on the current commit. Do not mistake earlier successful Qwen-only checks for runtime validation.
