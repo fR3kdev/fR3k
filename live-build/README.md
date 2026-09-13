@@ -14,7 +14,7 @@ For a plain-language explanation of the files and project, read [the project syn
 
 The former Gmail/Google connector brief is superseded; the active GitHub-only scope is recorded in the directive. The [mission dashboard brief](DEVELOPMENT_PATHWAY_DASHBOARD.md) remains usable only when it directly advances the judged demo. The [completion ledger](COMPLETION.md) tracks verified state.
 
-Read the [senior developer handoff manifest](HANDOFF_MANIFEST.md) for the checkout, current code, test evidence and known issues.
+Read the [current developer handover](DEVELOPER_HANDOVER.md) for delivered commits, reproduction commands, verification evidence and the remaining implementation work. The [earlier handoff manifest](HANDOFF_MANIFEST.md) is historical.
 
 ## What I’m building
 

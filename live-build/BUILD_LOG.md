@@ -91,3 +91,11 @@ Bad entry:
 > Agent safety is complete.
 
 If there is no test, state observation, trace, commit, or reproducible artifact behind a claim, label it accordingly.
+
+## 2026-09-14 — Concurrent connector/dashboard delivery and developer handover
+
+- Ran two isolated jobs from `ab2be86`; integrated GitHub-only adapters as `9d46a36` and dashboard as `a220838`.
+- Integrated actual Arga runtime bridge, manual dashboard launcher, sidebar status refresh and Node 22 runtime CI as `81f034e`.
+- Combined suite: 46 passed; typecheck and sandbox demo passed. Chromium fixture and actual-runtime acceptance passed, including exact approval/separate resume, denial, comparisons and mobile layout.
+- Added `DEVELOPER_HANDOVER.md` with contracts, paths, commits, evidence, known runtime/Arga limitations and ordered remaining work.
+- Live external-app verification remains pending. No live comments or other external messages were sent. Local verification servers are stopped at handoff.
