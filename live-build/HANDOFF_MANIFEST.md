@@ -1,6 +1,6 @@
 # Senior developer handoff manifest
 
-Prepared 2026-09-14. Implementation stopped at the user's request. This document transfers the current work; it does not certify the project as complete.
+Prepared 2026-09-14. This is a historical implementation snapshot, not the active execution plan. **Before doing any work, follow [HACKATHON_DIRECTIVE.md](HACKATHON_DIRECTIVE.md).** Current Git state must be observed directly; the checkout/commit notes below are preserved only as handoff history.
 
 ## 1. Authoritative checkout and preservation
 
@@ -29,7 +29,7 @@ To reproduce: sort those repository-relative paths lexicographically; hash the c
 
 ## 2. Intended product and completion scope
 
-Build one reusable agent engine that observes external state, plans, checks policy, acts, reads the result back, independently evaluates success and leaves replayable evidence. The first real mission crosses GitHub → Google Sheets/Drive → Gmail, with human approval before outbound communication. Calendar is optional follow-through.
+Build one reusable agent engine that observes external state, plans, checks policy, acts, reads the result back, independently evaluates success and leaves replayable evidence. The Gmail/Google reference mission was rejected and is superseded. The actual hackathon mission must use at least three necessary external apps selected from verified capabilities and recorded in the active directive before implementation.
 
 The full domain scope is:
 
