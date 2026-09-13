@@ -18,9 +18,8 @@
 | Independent evaluator | 🟨 PARTIALLY_VERIFIED | local final-state, trajectory, evidence and bounded-replanning tests pass |
 | Replay / counterfactual runner | ⏳ BUILDING | contract defined, implementation pending |
 | GitHub connector | ⏳ BUILDING | live repo operations work; contest runtime adapter pending |
-| Google Drive / Sheets connector | ⬜ NOT TESTED | pending auth + implementation |
-| Gmail connector | ⬜ NOT TESTED | pending auth + implementation |
-| Google Calendar connector | ⬜ NOT TESTED | optional follow-through path |
+| App capability inventory | ⏳ BUILDING | choose 3+ necessary apps from verified access |
+| Gmail / Calendar route | ❌ REJECTED | do not authenticate or implement |
 | Live dashboard | ⬜ NOT TESTED | planned after runtime core |
 | End-to-end 3+ app mission | ⬜ NOT TESTED | must be proven before demo |
 
