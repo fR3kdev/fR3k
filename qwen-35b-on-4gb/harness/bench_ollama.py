@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """bench_ollama.py — drive Ollama /api/chat, score against gold."""
-import argparse, json, time, sys, requests, pathlib
+import argparse, json, time, sys, pathlib
 
 URL = "http://127.0.0.1:11434"
 
@@ -9,6 +9,12 @@ def _score(text, gold_list):
     return any(g.lower() in t for g in gold_list)
 
 def _chat(model, prompt, max_tokens, timeout=900):
+    try:
+        import requests
+    except ImportError as exc:
+        raise RuntimeError(
+            "Missing dependency 'requests'. Install with: pip install -r requirements.txt"
+        ) from exc
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
