@@ -12,10 +12,10 @@
 | Four-world competition plan | ✅ VERIFIED | [`PLAN.md`](PLAN.md) |
 | Shared runtime architecture | ✅ VERIFIED | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 | Public build log | ✅ VERIFIED | [`BUILD_LOG.md`](BUILD_LOG.md) |
-| Typed agent runtime | ⏳ BUILDING | implementation not yet claimed complete |
-| Policy / autonomy engine | ⏳ BUILDING | architecture defined, implementation pending |
-| Append-only execution trace | ⏳ BUILDING | schema defined, implementation pending |
-| Independent evaluator | ⏳ BUILDING | contract defined, implementation pending |
+| Typed agent runtime | 🟨 PARTIALLY_VERIFIED | local implementation; 28 synthetic runtime tests and typecheck pass; live integration pending |
+| Policy / autonomy engine | 🟨 PARTIALLY_VERIFIED | allowlist, sandbox, budget, approval binding, denial and expiry tests pass locally |
+| Append-only execution trace | 🟨 PARTIALLY_VERIFIED | fsynced JSONL, sequence/hash checks and concurrent-writer tests; full crash recovery pending |
+| Independent evaluator | 🟨 PARTIALLY_VERIFIED | local final-state, trajectory, evidence and bounded-replanning tests pass |
 | Replay / counterfactual runner | ⏳ BUILDING | contract defined, implementation pending |
 | GitHub connector | ⏳ BUILDING | live repo operations work; contest runtime adapter pending |
 | Google Drive / Sheets connector | ⬜ NOT TESTED | pending auth + implementation |
@@ -25,6 +25,8 @@
 | End-to-end 3+ app mission | ⬜ NOT TESTED | must be proven before demo |
 
 ## Build priority
+
+The [completion ledger](COMPLETION.md) records current test evidence and remaining integration gates. Local runtime tests are in [`runtime.behavior.test.ts`](../agentic-action-engine/tests/runtime.behavior.test.ts). The isolated [connector](DEVELOPMENT_PATHWAY_CONNECTORS.md) and [dashboard](DEVELOPMENT_PATHWAY_DASHBOARD.md) briefs are ready for separate development agents.
 
 ### P0 — make one mission work end to end
 

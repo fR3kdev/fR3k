@@ -8,6 +8,12 @@
 >
 > The root of the repo is the public fR3k code drop. This folder is where the competition build, reasoning, architecture, milestones, evidence, and evolving implementation plan are exposed live.
 
+For a plain-language explanation of the files, the project, and the first working milestone, read [the project synopsis](SYNOPSIS.md).
+
+Parallel development briefs: [live app connectors](DEVELOPMENT_PATHWAY_CONNECTORS.md) and [mission dashboard](DEVELOPMENT_PATHWAY_DASHBOARD.md). Each defines isolated ownership, integration contracts, tests, and handoff requirements. The [completion ledger](COMPLETION.md) tracks the main scope.
+
+Implementation is paused for takeover. Read the [senior developer handoff manifest](HANDOFF_MANIFEST.md) for the authoritative checkout, current code, test evidence, known issues, and next steps.
+
 ## What I’m building
 
 One reusable **Agentic Decision & Action Engine** that can operate across four very different business worlds without turning into four unrelated chatbot demos.

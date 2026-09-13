@@ -6,6 +6,20 @@ It is intentionally plain: timestamp / change / evidence / next move.
 
 ---
 
+## 2026-09-14 — local runtime foundation and isolated development briefs
+
+- Saved the plain-language [synopsis](SYNOPSIS.md) in the primary checkout and linked it from the README.
+- Added typed tool contracts, strict runtime schemas, policy checks, exact-action approvals, a durable JSONL journal, baseline memory retrieval, independent evaluation and bounded replanning under `agentic-action-engine/src/`.
+- Added 28 behavioral tests covering approval/restart, denial/expiry, uncertain writes, provider-key retries, schema/evidence failures, budget limits, journal corruption and concurrent writers. All 28 pass locally; TypeScript checking also passes.
+- Saved separate [connector](DEVELOPMENT_PATHWAY_CONNECTORS.md) and [dashboard](DEVELOPMENT_PATHWAY_DASHBOARD.md) development assignments with disjoint ownership, snapshot isolation, interfaces, tests and handoff gates.
+- These changes are local and not published. Synthetic runtime tests do not establish a live three-app mission. Live adapters, process-crash recovery, replay, dashboard and full domain scenarios remain outstanding; see the [completion ledger](COMPLETION.md).
+
+### Next
+
+Finish durable recovery and runnable mission/replay entry points, then integrate the isolated connector and dashboard deliveries with the four domain scenarios and validate the full workflow.
+
+---
+
 ## 2026-09-14 — public build workspace created
 
 ### Changed
