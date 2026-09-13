@@ -4,11 +4,11 @@ Prepared 2026-09-14, Australia/Brisbane. This is the current handover after the 
 
 ## 1. Outcome and immediate objective
 
-The repository has a working local operator dashboard attached to the actual Arga runtime, contract-tested GitHub adapters, an agent-runtime CI workflow, audited crash recovery, a crash-replay/counterfactual runner, and a hardened Arga mission that proves duplicity from the raw payment ledger. The dashboard can pause before a refund, accept an exact operator approval, execute only after a separate Resume, verify the sandbox result, repeat for CRM, and display independent evaluation. A second independent run can be denied and compared with the successful run. Crash replay rebuilds Arga app state entirely from the durable journal and re-runs the same planner/evaluator against it; a counterfactual run of the pre-hardening v1 design shows exactly which proofs it never evaluated.
+The repository now has both a hardened synthetic regression world **and a verified live three-app mission**. The live path is YouTube → GitHub → ntfy → GitHub evidence. Run `live-incident-1789331116305` observed the exact public stream and canonical GitHub issue before any mutation, stopped for exact approval before the ntfy notification, reconciled receipt `yNc6zkrpzqhg`, stopped again for exact approval before the GitHub evidence comment, read that comment back exactly, and finished at **`CONFIRMED_SUCCESS` / evaluator `1.00`**.
 
-**The hackathon submission is not complete.** All Arga app state is synthetic and in memory (sealed in each `npm run demo`/`npm run dashboard` run). GitHub adapters are implemented and a **live read-only attach** is proven through the runtime (`npm run demo-live`, `CONFIRMED_SUCCESS`, score 1.00), but live *writes* remain operator-gated and Google services are unavailable. Replay/counterfactual, durable outcome memory and all eight adversarial variants are now implemented and tested; the model-driven planner is shipped as a bounded provider with fail-closed credentials, but has not been exercised against a real API key. A live three-external-app write mission, a model-backed run, and publication remain unfinished.
+The Arga Support/Billing/CRM mission remains the hardened `SIMULATION_ONLY` regression fixture with crash recovery, replay/counterfactual, durable outcome memory, all eight adversarial variants, and the local operator dashboard. The bounded model-planner architecture is implemented and tested, but a live model-backed run remains optional polish rather than a prerequisite for the now-proven three-app integration.
 
-The next developer should complete one coherent, evidenced vertical slice before expanding the four planned worlds. Do not represent a simulation, fixture screenshot, or connector unit test as external-app completion.
+The next developer should preserve the verified live path, keep the approval/read-back boundaries intact, and focus on presentation quality, demo ergonomics, and any remaining model-backed showcase. Do not weaken the evidence labels or replace the live mission with a mock.
 
 ## 2. Repository, branches and delivered commits
 
@@ -43,9 +43,9 @@ Preserve unrelated local changes and other workloads. Do not reset, clean or ove
 
 - The rejected Gmail/Calendar direction remains rejected. Do not authenticate or implement those adapters.
 - `DEVELOPMENT_PATHWAY_CONNECTORS.md` is superseded historical material. The executed connector assignment was GitHub-only, as recorded in the active directive.
-- The recorded mission is Arga duplicate-charge resolution: Support Desk intake → Billing refund → CRM resolution, with exact approval and read-back at each write.
-- GitHub availability is supporting infrastructure, not a reason to invent a generic connector-count demo.
-- No live comments, emails, refunds or CRM updates were sent during these jobs. Tests used injected transports and synthetic state.
+- The judged live mission is YouTube live-state observation → GitHub incident grounding → approved ntfy operator notification → approved GitHub evidence write. Arga duplicate-charge resolution remains the regression/safety fixture.
+- GitHub is the canonical incident/evidence bus in the live mission; YouTube and ntfy are necessary because they supply independent live state and operator notification boundaries.
+- One approved live ntfy notification and one approved GitHub evidence comment were sent during the verified mission. No email, refund, CRM, or unrelated production mutation occurred.
 - Account identifiers, tokens and private traces do not belong in public docs, fixtures or commits. Tool availability in the assistant does not supply a token to the Node runtime.
 - Before a live write, prepare the exact target and action, obtain required user authorization, and execute through the policy/approval boundary. Knowing an account or having repository access is not permission to send an arbitrary message.
 
@@ -64,6 +64,7 @@ Preserve unrelated local changes and other workloads. Do not reset, clean or ove
 | Arga variants | `src/demo/arga-variants.ts` | All eight PLAN.md adversarial variants as reproducible regression assets with invariant assertions; the partial-refund variant exposed and fixed a real refund-adoption bug. |
 | Replay | `src/demo/replay-bridge.ts` | Crash replay and counterfactual runner over rebuilt Arga state; emits baseline/candidate check diffs. |
 | Live launch | `src/live/github.ts`, `src/cli-live.ts` | Read-only GitHub attach: token from `GH_TOKEN`/`GITHUB_TOKEN` or `gh auth token` (fail closed), REST reads labelled `VERIFIED` through the runtime, writes never registered. |
+| Live incident mission | `src/connectors/incident.ts`, `src/demo/live-incident-mission.ts`, `src/live-cli.ts` | Real YouTube + GitHub + ntfy workflow with exact approval before both writes, reconcile-only semantics, read-after-write verification, evaluator score 1.00 on the verified run. |
 | CLI demo | `src/cli.ts` | Runs the mission, then prints crash replay and v1 counterfactual; automatically approves sandbox actions as `demo-operator`; never use this as the approval design for live actions. |
 | GitHub adapters | `src/connectors/index.ts` | Issue read and evidence comment write, fixed origin, repository allowlist, sanitized faults, exact reconciliation. |
 | Dashboard contract | `src/dashboard/bridge.ts` | Injected list, inspect, approve, resume and compare bridge. |
@@ -84,7 +85,7 @@ The credential callback and allowlist are captured at registration. Requests go 
 
 The write appends a hash-based correlation marker. Verification scans paginated comments, rejects duplicate markers, requires exact issue/body/source identity, then GETs the exact comment. A POST response alone is not confirmation. Empty search results, malformed responses, changed content or ambiguous results remain unknown; no blind write retry is added. Correlation markers are not provider-enforced idempotency keys.
 
-These adapters are not wired into a production mission launcher. Live testing still needs host credentials, an exact repository allowlist, approved resources and real runtime evidence. `gh` was not available on PATH during this session; Git operations worked over the configured remote and GitHub inspection used connector tools/public REST. Do not assume old handoff claims about the CLI or OAuth scopes describe the current environment.
+These adapters are wired into the live incident launcher with an exact repository allowlist and operator approval boundary. The GPD `gh` session supplied the runtime token during the verified mission. The evidence write is confirmed in issue #1; do not broaden repository scope or remove the approval requirement.
 
 ### Dashboard contract and security
 
@@ -113,7 +114,10 @@ npm run typecheck
 npm test
 npm run demo
 npm run dashboard
+npm run demo:live
 ```
+
+`npm run demo:live` is the judged external-app path. It reads the exact YouTube stream and GitHub issue, then prompts for each real write. Do not set `FR3K_APPROVE=1` for ordinary demos unless the exact ntfy topic/message and GitHub evidence comment have already been reviewed and authorized.
 
 Open the loopback URL printed by the launcher. The ordinary startup sequence is:
 
@@ -139,10 +143,11 @@ Do not run both launchers on the default port simultaneously. The verification s
 | Check | Observed result |
 | --- | --- |
 | Clean dependency install | Passed, Node 22 |
-| Combined `npm test` | **70 passed, 0 failed, 0 skipped** |
+| Combined `npm test` | **77 passed, 0 failed, 0 skipped** on the integrated live branch |
 | `npm run typecheck` | Passed |
 | `npm run demo` | `CONFIRMED_SUCCESS`, evaluator 1.00; replay candidate `CONFIRMED_SUCCESS` score 1.00 with zero regressions; v1 counterfactual listed the three proofs it never evaluates; durable-outcome reconstruction line; 8-variant adversarial panel all PASS |
-| `npm run demo-live` | `CONFIRMED_SUCCESS`, score 1.00 against `fR3kdev/fR3k`: repo info, recent commits, open issues all `VERIFIED` via the operator token; read-only by construction |
+| `npm run demo-live` | Existing read-only GitHub attach still passes; separate judged `npm run demo:live` completed the real YouTube → GitHub → ntfy → GitHub evidence mission at `CONFIRMED_SUCCESS`, score 1.00 |
+| Live three-app mission | Run `live-incident-1789331116305`; ntfy receipt `yNc6zkrpzqhg`; GitHub evidence comment `5655933189`; all 7 checks pass; both writes approved and read back |
 | Reliability cases | 9 tests: stale-lock recovery and live-owner busy; audited `repairTail` (snapshot, tail-only truncation, corrupt-prefix refusal); torn-status authoritative denial; `HangError` on a hung planner; hung-read budget exhaustion plus `recover()`; deployed tool-revision invalidating a granted approval; `reconstructArgaState` and no-second-refund replay; counterfactual diff of the v1 design |
 | Durable memory cases | 3 tests: outcome memory reconstructed after a restart and fed back; append-only and hash-reject; outcome seeded into the next run |
 | Bounded planner cases | 8 tests: happy path to independent green; forbidden-tool injection; ghost evidence ref; write without evidence; finish without evidence; provider hang; fail-closed credentials; ref-budget guard |
@@ -172,15 +177,11 @@ These are ephemeral local files, not repository assets. Preserve copies in an ap
 
 ## 7. Known limitations and concrete engineering work
 
-### P0: select and prove the real mission
+### P0: select and prove the real mission — completed
 
-1. Inventory apps and runtime authentication actually available now. Assistant connector access is not host authentication.
-2. Choose three necessary app roles for the recorded Arga problem or explicitly record a justified replacement in the directive before building it. GitHub-only capability does not satisfy this gate.
-3. Define exact test resources, customer/charge identity, permitted action, forbidden effects and evidence requirements.
-4. Build the thinnest adapters and launcher around those contracts, with injected credentials, allowlists and exact-action approval.
-5. Capture authenticated reads and approved writes with independent read-back through the runtime. Do not substitute API mocks or the current state Maps.
+The judged path is now YouTube → GitHub → ntfy → GitHub evidence. It is recorded in the directive and issue #1. The verified run used real provider state, exact approval before both external writes, reconcile-only semantics, and independent read-back. The first ntfy poll exposed provider visibility lag; the runtime failed closed instead of duplicating the notification, then operator-only verifier reconciliation confirmed the original receipt.
 
-Acceptance: one reproducible workflow across three real app boundaries, policy pauses before consequential actions, exact records verified afterward, unrelated records preserved, independent evaluator grounded in those observations.
+Acceptance is satisfied by run `live-incident-1789331116305` and evidence comment `5655933189`. Preserve this path as the headline proof.
 
 ### P0: harden the Arga mission and evaluator — completed in the gap-fill session
 
@@ -193,7 +194,7 @@ The following items from the previous handover are **resolved** and covered by t
 - Unrelated-charge invariant preserved via an explicit post-refund read-back of CHG-89 and an evaluator check that no CHG-89 refund exists.
 - `reconstructArgaState(events, seed)` rebuilds Arga app state from the durable journal.
 
-**Remaining for the mission:** the mission planner `arga-planner-v2` is deterministic and emergency-drives incident/charge IDs from closure state (full history of the bounded model-backed `src/model/` design is shipped, but no live API key is set, so no model-backed run has been certified). The `npm run dashboard` launcher still creates fresh in-memory app state on startup; the replay runner (not the dashboard) is the crash-recovery path today. Live GitHub *reads* are proven; live *writes* stay operator-gated until the exact target and operator approval exist, and a contiguous three-app write workflow has not run live.
+**Remaining for the mission:** the mission planner `arga-planner-v2` is deterministic and emergency-drives incident/charge IDs from closure state (full history of the bounded model-backed `src/model/` design is shipped, but no live API key is set, so no model-backed run has been certified). The `npm run dashboard` launcher still creates fresh in-memory app state on startup; the replay runner (not the dashboard) is the crash-recovery path today. Live GitHub reads and the approval-gated evidence write are proven in the three-app mission. The Arga dashboard itself remains synthetic; do not conflate that UI fixture with the external-app proof.
 
 ### P0/P1: runtime crash and retry boundaries — completed in the gap-fill session
 

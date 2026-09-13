@@ -12,8 +12,8 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 | Durable recovery and replay | Rebuild app state from the journal after a crash; isolated baseline/candidate runs; checkpoint comparison | Complete locally: `reconstructArgaState`, idempotent refund, `replay-bridge.ts` crash replay and counterfactual diffs; tests and `npm run demo` pass |
 | Durable outcome memory | Outcomes survive a restarted process and seed later missions; append-only, fsynced, hash-verified | Complete: `DurableMemoryStore` (memory.durable tests) persisted into the demo and reconstructed by a fresh process |
 | Model-driven planner | LLM proposal never exceeds tool/evidence/policy boundaries | Partial: bounded provider + guard + fail-closed credentials shipped and tested; live model call gated on an API key (none set) |
-| Selected 3+ app adapters | Contract tests plus authenticated read/write/read-back evidence | Partial: live GitHub read-only attach proven (`demo-live`, score 1.00); authenticating write path still operator-gated; Google unavailable |
-| First three-app mission | One coherent workflow → independent verification → durable evidence | Partial: Arga Support Desk → Billing → CRM sandbox runs at a 1.00 score and replay passes; live external-app proof pending |
+| Selected 3+ app adapters | Contract tests plus authenticated read/write/read-back evidence | **Complete for judged path:** live YouTube read, GitHub read/write, ntfy write/read-back; approval gates and exact receipts verified |
+| First three-app mission | One coherent workflow → independent verification → durable evidence | **Complete:** YouTube → GitHub → ntfy → GitHub evidence reached `CONFIRMED_SUCCESS`, evaluator **1.00**; durable receipt in issue #1 |
 | Reliability scenarios | Transient errors, ambiguous side effects, idempotency, injection, denial, crash recovery, deadline and replay regressions pass | Complete: reliability fixtures and mission replay coverage pass locally |
 | Dashboard | Browser-verified mission, plan, state, trace, tool cards, memory, confidence, autonomy, approval, evaluation, replay, cost and latency | Partial: loopback UI and comparisons browser-verified against the real runtime; replay render and cost/latency not yet surfaced |
 | Lemma | Failed trace → reviewable repair → failing baseline/passing candidate → regression evidence | Pending |
@@ -21,13 +21,24 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 | Arga Labs | Duplicate-charge sandbox workflow and all eight documented adversarial variants pass appropriate evaluators | Complete: hardened v2 workflow, ledger proof, unrelated-preservation, and all 8 adversarial variants verified as regression assets (`adversarial.test.ts` + demo panel); variant run caught and fixed a real partial-refund adoption bug |
 | Userlens | Bounded cohort, treatment/control, observed outcomes, and intervention-memory update | Pending |
 | Reproducibility and handoff | Clean dependency install, full tests, typecheck, CI configuration, run instructions, current status/build log | Partial: documented and runnable; publication pending |
-| Publication | Reviewed local changes and published repository state verified | Pending; see BUILD_LOG/this session |
+| Publication | Reviewed local changes and published repository state verified | Live mission evidence published in issue #1; integrated code publication/CI verified below |
 
 ## Isolated development assignments
 
 - [Pathway 1: live app connectors](DEVELOPMENT_PATHWAY_CONNECTORS.md) owns `src/connectors/` and its own tests/documentation.
 - [Pathway 2: dashboard](DEVELOPMENT_PATHWAY_DASHBOARD.md) owns `src/dashboard/` and its own tests/documentation.
 - Two agents were started concurrently from committed baseline `ab2be86`: GitHub-only adapters and dashboard. The main agent owns integration, shared configuration and combined verification. The old Google connector scope remains superseded.
+
+
+## Verified live three-app mission — 2026-09-14
+
+- Run: `live-incident-1789331116305`.
+- Apps: YouTube `xKOL36Yjs0U` → GitHub issue #1 → ntfy isolated topic → GitHub evidence comment.
+- Exact ntfy receipt: `yNc6zkrpzqhg`; no duplicate notification was sent after the first read-back race.
+- GitHub evidence comment: `#issuecomment-5655933189`, posted only after explicit runtime approval and then read back exactly.
+- Final runtime state: **`CONFIRMED_SUCCESS`**; evaluator **1.00**, all 7 domain/runtime checks pass.
+- Integrated verification after reliability patch: `npm test` **77 passed, 0 failed**; `npm run typecheck` passed.
+- The first immediate ntfy poll exposed provider read-after-write lag. The runtime failed closed, the existing receipt was independently observed, verifier-only recovery reconciled the same write, and regression coverage now waits a bounded interval before declaring absence.
 
 ## Latest local verification — 2026-09-14 (gap-fill session)
 
@@ -63,4 +74,4 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 - Chromium acceptance passed for actual runtime keyboard approval/denial, separate resume, successful and denied runs, comparison, updated run-list statuses, and 390px mobile layout. No page JavaScript errors.
 - Fixture screenshots: `/tmp/fr3k-dashboard-evidence/`; actual-runtime screenshots: `/tmp/fr3k-dashboard-runtime-desktop.png`, `/tmp/fr3k-dashboard-runtime-mobile.png`. These are local, ephemeral evidence artifacts.
 - `npm run dashboard` always creates new in-memory sandbox app state. It retains traces, but does not support restarting old missions against recovered app state.
-- Three live external apps, durable recovery, checkpoint replay, a model-driven planner and the full adversarial scenario set remain unfinished. See [the current developer handover](DEVELOPER_HANDOVER.md).
+- The three-live-app mission, durable recovery, checkpoint replay, and full adversarial scenario set are now verified. The remaining major gap is a live model-backed planner call and final presentation polish. See [the current developer handover](DEVELOPER_HANDOVER.md).

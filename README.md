@@ -10,6 +10,24 @@
   <img src="./assets/fr3k-hero.svg" alt="fR3k Open Code Drop" width="100%" />
 </p>
 
+## 🔴 LIVE HACKATHON PROOF: three real apps, verified writes
+
+The headline build is now a real **YouTube → GitHub → ntfy → GitHub evidence** agent, not a connector mock.
+
+On the verified run, the runtime read the live YouTube stream, grounded GitHub issue #1, stopped for exact approval before the ntfy notification, reconciled the external receipt, stopped again before the GitHub evidence write, read that comment back exactly, and finished at **`CONFIRMED_SUCCESS` / evaluator `1.00`**.
+
+**Receipts:** [`live-build/evidence/LIVE_MISSION_2026-09-14.md`](live-build/evidence/LIVE_MISSION_2026-09-14.md) · [`Issue #1`](https://github.com/fR3kdev/fR3k/issues/1)
+
+```bash
+cd agentic-action-engine
+npm ci
+npm run typecheck
+npm test
+npm run demo:live
+```
+
+`demo:live` performs real external writes only after the exact action is approved.
+
 ## Useful code. Strange experiments. No velvet rope.
 
 This is the public **fR3k code drop**: runnable things I actually find useful, interesting, ridiculous, or all three at once.

@@ -129,3 +129,16 @@ If there is no test, state observation, trace, commit, or reproducible artifact 
 - Combined suite: 46 passed; typecheck and sandbox demo passed. Chromium fixture and actual-runtime acceptance passed, including exact approval/separate resume, denial, comparisons and mobile layout.
 - Added `DEVELOPER_HANDOVER.md` with contracts, paths, commits, evidence, known runtime/Arga limitations and ordered remaining work.
 - Live external-app verification remains pending. No live comments or other external messages were sent. Local verification servers are stopped at handoff.
+
+## 2026-09-14 — live three-app mission crossed the line
+
+- Integrated the live incident mission onto the hardened runtime baseline.
+- Real YouTube connector observed `xKOL36Yjs0U` live with exact title/identity.
+- Real GitHub connector grounded issue #1.
+- Exact operator approval authorized one ntfy notification; provider returned receipt `yNc6zkrpzqhg`.
+- Immediate read-back exposed ntfy eventual-consistency lag. Runtime failed closed and did **not** duplicate the write.
+- Verifier-only operator recovery later confirmed the same external receipt, then the runtime requested a second exact approval for the GitHub evidence comment.
+- GitHub comment `5655933189` was posted and read back exactly.
+- Final state: `CONFIRMED_SUCCESS`; evaluator `1.00`; all 7 checks passed.
+- Added bounded ntfy read-back polling regression; integrated suite now 77/77 with typecheck green.
+- Durable evidence: [`evidence/LIVE_MISSION_2026-09-14.md`](evidence/LIVE_MISSION_2026-09-14.md).

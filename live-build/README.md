@@ -26,7 +26,7 @@ Core loop:
 
 The point is not to produce clever text. The point is to change state across real tools, verify the change, and leave receipts.
 
-The first runnable vertical slice is the Arga Labs duplicate-charge mission: Support Desk → Billing → CRM. Run it with `cd agentic-action-engine && npm run demo`. It is a production-shaped local sandbox and every observation is explicitly labelled `SIMULATION_ONLY`; live external-app verification remains pending.
+The judged live slice is now **YouTube → GitHub → ntfy → GitHub evidence**. `npm run demo:live` reads the real stream and canonical issue, gates both external writes behind exact operator approval, performs read-after-write verification, and leaves a hash-chained trace. The verified run reached **`CONFIRMED_SUCCESS` with evaluator score 1.00**. Arga Support Desk → Billing → CRM remains the hardened `SIMULATION_ONLY` regression fixture behind `npm run demo`.
 
 ### Run the operator dashboard
 
@@ -92,9 +92,7 @@ Every write-capable tool should declare:
 
 ## Reference multi-app path
 
-The judged demo will prove one coherent agent workflow across **at least three necessary external apps**.
-
-The earlier Gmail/calendar route was rejected. App selection must follow a verified capability inventory and a written demo decision; connector availability alone is not a product idea. See the [active hackathon directive](HACKATHON_DIRECTIVE.md).
+The judged demo now has one coherent workflow across **three real external apps**: YouTube supplies live incident state, GitHub supplies canonical task/evidence state, and ntfy supplies the operator notification channel. GitHub then receives the verified evidence receipt. The earlier Gmail/calendar route remains rejected. See the [live evidence record](evidence/LIVE_MISSION_2026-09-14.md) and [active directive](HACKATHON_DIRECTIVE.md).
 
 ## Two-minute demo target
 

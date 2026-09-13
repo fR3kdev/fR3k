@@ -57,3 +57,17 @@ test('ntfy lost response reconciles once and duplicate marker fails closed', asy
   const duplicate = setup((_url, init) => init?.method === 'POST' ? json(stored) : response(`${JSON.stringify(stored)}\n${JSON.stringify({ ...stored, id: 'evt-2' })}\n`)).get('ntfy.publish_status');
   assert.equal((await duplicate.verify(input, context)).status, 'unknown');
 });
+
+test('ntfy verifier tolerates bounded provider read-after-write lag', async () => {
+  const input = { topic, title: 'Status', message: 'Stream verified' };
+  const stored = { id: 'evt-lagged', event: 'message', topic, title: input.title, message: `${input.message}\n${marker}` };
+  let polls = 0;
+  const tool = setup((_url, init) => {
+    if (init?.method === 'POST') return json(stored);
+    polls++;
+    return response(polls === 1 ? '' : `${JSON.stringify(stored)}\n`);
+  }).get('ntfy.publish_status');
+  const result = await tool.execute(input, context);
+  assert.equal((await tool.verify(input, context, result)).status, 'confirmed');
+  assert.equal(polls, 2);
+});

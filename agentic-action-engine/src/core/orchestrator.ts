@@ -167,6 +167,41 @@ export class Runtime {
     return this.run(runId);
   }
 
+  /** Operator-only reconciliation for a write that executed but was not confirmed in time.
+   * This method never calls execute(); it can only re-run the registered verifier
+   * against the exact pending action and previously recorded provider result.
+   */
+  async reconcileWrite(runId: string): Promise<RunView> {
+    identifier.parse(runId);
+    let confirmed = false;
+    await this.store.withRun(runId, async journal => {
+      const view = project(journal.events);
+      if (view.status !== 'CONFIRMED_FAILURE' || !view.pending) throw new Error('Run is not eligible for write reconciliation');
+      const { action, step, digest: actionDigest } = view.pending;
+      const tool = this.tools.get(action.tool);
+      tool.parse(action.input);
+      if (tool.effect !== 'write') throw new Error('Pending action is not a write');
+      if (this.actionDigest(view, action, tool) !== actionDigest) throw new Error('Tool contract or action changed after execution');
+      const stepEvents = journal.events.filter(event => event.data.step === step);
+      if (!stepEvents.some(event => event.kind === 'tool.started') || stepEvents.some(event => event.kind === 'tool.verification' && event.data.status === 'confirmed')) {
+        throw new Error('No unconfirmed executed write to reconcile');
+      }
+      const prior = stepEvents.filter(event => event.kind === 'tool.result').at(-1)?.data.output;
+      if (prior === undefined) throw new Error('No provider result exists for reconciliation');
+      const context: ToolContext = { runId: view.mission.id, step,
+        idempotencyKey: digest({ runId: view.mission.id, step, actionDigest }), signal: AbortSignal.timeout(this.timeoutMs) };
+      const result = await timed(this.timeoutMs, () => tool.verify(action.input, context, prior));
+      await journal.append('runtime.recovery', { reason: 'Operator requested verifier-only write reconciliation', step, tool: tool.name });
+      await journal.append('tool.verification', { step, tool: tool.name, status: result.status, source: result.source,
+        observation: result.observation ?? null, label: tool.environment === 'sandbox' ? 'SIMULATION_ONLY' : 'VERIFIED' });
+      if (result.status !== 'confirmed') return;
+      await journal.append('step.completed', { step, tool: tool.name });
+      await journal.append('run.status', { status: 'RUNNING', reason: 'Previously executed write confirmed by reconciliation' });
+      confirmed = true;
+    });
+    return confirmed ? this.run(runId) : this.inspect(runId);
+  }
+
   private async status(journal: Journal, status: RunStatus, reason: string): Promise<RunView> {
     await journal.append('run.status', { status, reason });
     return project(journal.events);

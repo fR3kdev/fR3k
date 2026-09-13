@@ -74,3 +74,11 @@ The shared baseline is `ab2be86`. Jobs use isolated Git worktrees because the ru
 - Main integration: run combined tests, typecheck and sandbox demo, add runtime CI, review and publish both deliveries to `main`.
 
 Acceptance is contract-tested GitHub adapters plus a browser-verified dashboard operating the real sandbox runtime. Live external-app verification, checkpoint replay and process-crash recovery remain separate gates. Gmail and Calendar remain excluded.
+
+## Judged live mission verified — 2026-09-14
+
+The headline judged path is now **YouTube → GitHub → ntfy → GitHub evidence**. This supersedes the earlier statement that live three-app selection was still gated.
+
+Verified run `live-incident-1789331116305` reached `CONFIRMED_SUCCESS` / evaluator `1.00`. YouTube live state and GitHub issue #1 were observed before any write. The ntfy notification and GitHub evidence comment each required an exact operator approval and were independently read back. Evidence comment: https://github.com/fR3kdev/fR3k/issues/1#issuecomment-5655933189.
+
+The Arga Support/Billing/CRM path remains a valuable `SIMULATION_ONLY` reliability fixture, not the headline external-app proof.

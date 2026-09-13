@@ -115,19 +115,24 @@ export function registerIncidentConnectors(registry: ToolRegistry, options: Inci
   };
   const verify = async (value: z.infer<typeof ntfyInput>, context: ToolContext, result?: z.infer<typeof ntfyOutput>): Promise<Verification> => {
     if (!ntfyTopics.has(value.topic)) return { status: 'unknown', source: source(value.topic) };
+    const body = messageBody(value, context);
     try {
-      const url = `${source(value.topic)}/json?poll=1&since=10m`;
-      const response = await transport(url, { redirect: 'error', signal: context.signal, headers: { Accept: 'application/x-ndjson, application/json' } });
-      if (!response.ok) return { status: 'unknown', source: source(value.topic) };
-      const text = await response.text();
-      const events = text.split(/\r?\n/).filter(Boolean).map(line => ntfyEvent.parse(JSON.parse(line)));
-      const body = messageBody(value, context);
-      const matches = events.filter(event => event.event === 'message' && event.topic === value.topic && event.title === value.title && event.message === body);
-      if (matches.length === 0) return { status: 'absent', source: source(value.topic) };
-      if (matches.length !== 1) return { status: 'unknown', source: source(value.topic) };
-      const event = matches[0]!;
-      if (result && result.eventId !== event.id) return { status: 'unknown', source: source(value.topic) };
-      return { status: 'confirmed', source: source(value.topic), observation: { eventId: event.id, topic: event.topic, title: event.title ?? '', message: event.message ?? '' } };
+      for (let attempt = 0; attempt < 4; attempt++) {
+        const url = `${source(value.topic)}/json?poll=1&since=10m`;
+        const response = await transport(url, { redirect: 'error', signal: context.signal, headers: { Accept: 'application/x-ndjson, application/json' } });
+        if (!response.ok) return { status: 'unknown', source: source(value.topic) };
+        const text = await response.text();
+        const events = text.split(/\r?\n/).filter(Boolean).map(line => ntfyEvent.parse(JSON.parse(line)));
+        const matches = events.filter(event => event.event === 'message' && event.topic === value.topic && event.title === value.title && event.message === body);
+        if (matches.length > 1) return { status: 'unknown', source: source(value.topic) };
+        if (matches.length === 1) {
+          const event = matches[0]!;
+          if (result && result.eventId !== event.id) return { status: 'unknown', source: source(value.topic) };
+          return { status: 'confirmed', source: source(value.topic), observation: { eventId: event.id, topic: event.topic, title: event.title ?? '', message: event.message ?? '' } };
+        }
+        if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)));
+      }
+      return { status: 'absent', source: source(value.topic) };
     } catch { return { status: 'unknown', source: source(value.topic) }; }
   };
 
