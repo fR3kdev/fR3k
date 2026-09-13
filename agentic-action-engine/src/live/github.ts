@@ -33,8 +33,8 @@ export async function resolveGithubToken(): Promise<GithubCredential> {
   throw new Error('No GitHub token: set GH_TOKEN/GITHUB_TOKEN or authenticate `gh auth login` ');
 }
 
-async function gh(token: string, path: string, timeoutMs = 30_000): Promise<unknown> {
-  const response = await fetch(`https://api.github.com${path}`, {
+async function gh(token: string, path: string, fetcher: typeof fetch = fetch, timeoutMs = 30_000): Promise<unknown> {
+  const response = await fetcher(`https://api.github.com${path}`, {
     headers: { accept: 'application/vnd.github+json', authorization: `Bearer ${token}`, 'user-agent': 'fr3k-agentic-action-engine' },
     signal: AbortSignal.timeout(timeoutMs),
   });
@@ -45,14 +45,14 @@ async function gh(token: string, path: string, timeoutMs = 30_000): Promise<unkn
 }
 
 /** Build the read-only GitHub tool set. Writes are deliberately not registered. */
-export function registerGithubReadTools(registry: ToolRegistry, token: string, repo: { owner: string; repo: string }) {
+export function registerGithubReadTools(registry: ToolRegistry, token: string, repo: { owner: string; repo: string }, fetcher: typeof fetch = fetch) {
   registry.register({
     name: 'github.repo_info', description: 'Read repository metadata and default branch', effect: 'read', autonomy: 0,
     environment: 'live', reversible: true, blastRadius: 'None (read)', idempotency: 'read-only',
     verificationMethod: 'Direct GitHub REST read-back with the same operator token',
     input: repoInfoInput, output: repoInfoOutput,
     async execute(input) {
-      const result = await gh(token, `/repos/${input.owner}/${input.repo}`) as { id: number; name: string; full_name: string; private: boolean; archived: boolean; default_branch: string; updated_at: string };
+      const result = await gh(token, `/repos/${input.owner}/${input.repo}`, fetcher) as { id: number; name: string; full_name: string; private: boolean; archived: boolean; default_branch: string; updated_at: string };
       return { id: result.id, name: result.name, fullName: result.full_name, private: result.private, archived: result.archived, defaultBranch: result.default_branch, updatedAt: result.updated_at, source: `https://api.github.com/repos/${input.owner}/${input.repo}` };
     },
   });
@@ -62,7 +62,7 @@ export function registerGithubReadTools(registry: ToolRegistry, token: string, r
     verificationMethod: 'Direct GitHub REST read-back with the same operator token',
     input: commitsInput, output: commitsOutput,
     async execute(input) {
-      const result = await gh(token, `/repos/${input.owner}/${input.repo}/commits?per_page=${input.perPage}`) as Array<{ sha: string; commit: { message: string; author: { date: string } } }>;
+      const result = await gh(token, `/repos/${input.owner}/${input.repo}/commits?per_page=${input.perPage}`, fetcher) as Array<{ sha: string; commit: { message: string; author: { date: string } } }>;
       return { owner: input.owner, repo: input.repo, commits: result.map(commit => ({ sha: commit.sha.slice(0, 7), date: commit.commit.author.date, message: commit.commit.message.split('\n')[0] })) };
     },
   });
@@ -72,7 +72,7 @@ export function registerGithubReadTools(registry: ToolRegistry, token: string, r
     verificationMethod: 'Direct GitHub REST read-back with the same operator token',
     input: issuesInput, output: issuesOutput,
     async execute(input) {
-      const result = await gh(token, `/repos/${input.owner}/${input.repo}/issues?state=open&per_page=10`) as Array<{ number: number; title: string; state: string; created_at: string }>;
+      const result = await gh(token, `/repos/${input.owner}/${input.repo}/issues?state=open&per_page=10`, fetcher) as Array<{ number: number; title: string; state: string; created_at: string }>;
       return { owner: input.owner, repo: input.repo, issues: result.map(issue => ({ number: issue.number, title: issue.title, state: issue.state, createdAt: issue.created_at })) };
     },
   });
