@@ -10,8 +10,8 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 | Core runtime, typed tools, policy, approvals, trace | Typecheck and behavioral tests; restart, denial, malformed input, and duplicate-action coverage | Partial: 28 local runtime tests and typecheck pass; process-crash recovery and live integration still pending |
 | Independent evaluator and bounded replanning | Final-state and trajectory assertions; deliberate failure remains a failure | Partial: local success/failure, evidence validation and bounded-replan tests pass |
 | Memory and replay | Evidence-backed retrieval; isolated baseline/candidate runs; checkpoint comparison | Pending |
-| GitHub, Sheets/Drive, Gmail adapters | Contract tests plus authenticated read/write/read-back evidence | Pending |
-| First real three-app mission | GitHub intake → Google context → approved Gmail action → independent verification and durable evidence | Pending Google authentication and implementation |
+| Selected 3+ app adapters | Contract tests plus authenticated read/write/read-back evidence | Pending capability inventory and mission decision |
+| First real three-app mission | One coherent workflow → independent verification → durable evidence | Pending mission selection and implementation |
 | Reliability scenarios | Transient errors, ambiguous side effects, idempotency, injection, denial, and replay regressions pass | Pending |
 | Dashboard | Browser-verified mission, plan, state, trace, tool cards, memory, confidence, autonomy, approval, evaluation, replay, cost and latency | Pending |
 | Lemma | Failed trace → reviewable repair → failing baseline/passing candidate → regression evidence | Pending |
