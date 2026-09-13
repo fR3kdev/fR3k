@@ -1,8 +1,12 @@
 # fR3k Hackathon Submission
 
 > **An agent that acts, then proves it.**
+>
+> **Judge summary:** A real multi-app agent that can act on external systems, prove exactly what happened, survive uncertain writes without duplicating side effects, and refuse to claim success without evidence.
 
 This is the judge-facing submission bundle for the Multi-App AI Agent Hackathon. The working project is the repository root; this folder contains the two-minute demo and the short system/reliability brief requested by the event.
+
+> **Post-submission hardening:** additional real web-server path testing was run after the submission was filed. It is additional validation, not a rewrite of the frozen judged run.
 
 ## Deliverables
 
