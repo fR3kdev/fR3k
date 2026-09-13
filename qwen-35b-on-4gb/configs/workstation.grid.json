@@ -1,0 +1,15 @@
+{
+  "rig": "workstation",
+  "gpu": "Quadro T1000 4GB",
+  "ram_gb": 32,
+  "cpu_threads": 12,
+  "engine": "ollama-0.22 (llama.cpp internal)",
+  "notes": "Qwen3.6-35B-A3B = 41 layers (model). Ollama auto-fits ~11 GPU layers on T1000 with q8_0 KV. NUM_GPU=-1 → auto. We sweep KV type + ctx and let Ollama pick layer count.",
+  "grid": [
+    {"NUM_GPU": -1, "NUM_CTX": 4096,  "KV_TYPE": "q8_0", "USE_MMAP": "true",  "USE_MLOCK": "true", "label": "auto_4k_q8"},
+    {"NUM_GPU": -1, "NUM_CTX": 4096,  "KV_TYPE": "q4_0", "USE_MMAP": "true",  "USE_MLOCK": "true", "label": "auto_4k_q4"},
+    {"NUM_GPU": -1, "NUM_CTX": 8192,  "KV_TYPE": "q4_0", "USE_MMAP": "true",  "USE_MLOCK": "true", "label": "auto_8k_q4"},
+    {"NUM_GPU": -1, "NUM_CTX": 16384, "KV_TYPE": "q4_0", "USE_MMAP": "true",  "USE_MLOCK": "true", "label": "auto_16k_q4"},
+    {"NUM_GPU": -1, "NUM_CTX": 4096,  "KV_TYPE": "q8_0", "USE_MMAP": "false", "USE_MLOCK": "true", "label": "auto_4k_q8_no_mmap"}
+  ]
+}
