@@ -35,12 +35,9 @@ These use cases share the execution machinery. Each supplies its own data, tools
 
 ## The first working milestone
 
-The first target is one complete mission across **GitHub → Google Sheets / Drive → Gmail**, with Google Calendar as optional follow-through.
+The first target is one complete mission across **at least three necessary external apps**, selected from verified authenticated capabilities. The former Gmail/calendar route was rejected; see [HACKATHON_DIRECTIVE.md](HACKATHON_DIRECTIVE.md).
 
-- **GitHub:** holds the mission and durable task or evidence record.
-- **Sheets / Drive:** supplies structured information and source documents.
-- **Gmail:** performs outbound communication after approval.
-- **Calendar:** may support follow-through after an introduction is accepted.
+The final app roles will be recorded only after the capability inventory and demo decision. Each selected app must contribute an observable, verifiable step to the same useful workflow.
 
 ### Example intended workflow
 
