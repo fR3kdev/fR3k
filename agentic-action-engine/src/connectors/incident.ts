@@ -24,7 +24,11 @@ const ntfyInput = z.strictObject({
   title: z.string().min(1).max(120),
   message: z.string().min(1).max(1000),
 });
-const ntfyOutput = z.strictObject({ eventId: z.string().min(1), sourceUrl: z.url() });
+const ntfyOutput = z.strictObject({
+  eventId: z.string().min(1),
+  sourceUrl: z.url(),
+  sentAt: z.number().int(),
+});
 const ntfyEvent = z.object({
   id: z.string().min(1),
   event: z.string(),
@@ -110,7 +114,9 @@ export function registerIncidentConnectors(registry: ToolRegistry, options: Inci
     try {
       const event = ntfyEvent.parse(await response.json());
       if (event.event !== 'message' || event.topic !== value.topic || event.title !== value.title || event.message !== messageBody(value, context)) throw new Error('response mismatch');
-      return { eventId: event.id, sourceUrl: source(value.topic) };
+      const sentAt = Number(event.time);
+      if (!Number.isFinite(sentAt)) throw new Error('event time missing');
+      return { eventId: event.id, sourceUrl: source(value.topic), sentAt };
     } catch { throw new ToolFault('UNCERTAIN'); }
   };
   const verify = async (value: z.infer<typeof ntfyInput>, context: ToolContext, result?: z.infer<typeof ntfyOutput>): Promise<Verification> => {
@@ -118,7 +124,8 @@ export function registerIncidentConnectors(registry: ToolRegistry, options: Inci
     const body = messageBody(value, context);
     try {
       for (let attempt = 0; attempt < 4; attempt++) {
-        const url = `${source(value.topic)}/json?poll=1&since=10m`;
+        const since = result ? Math.max(0, result.sentAt - 1) : '10m';
+        const url = `${source(value.topic)}/json?poll=1&since=${since}`;
         const response = await transport(url, { redirect: 'error', signal: context.signal, headers: { Accept: 'application/x-ndjson, application/json' } });
         if (!response.ok) return { status: 'unknown', source: source(value.topic) };
         const text = await response.text();

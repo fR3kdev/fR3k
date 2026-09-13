@@ -6,6 +6,7 @@ import { ToolFault, ToolRegistry, type ToolContext } from '../src/tools/registry
 
 const videoId = 'xKOL36Yjs0U';
 const topic = 'fr3k-test-topic';
+const now = Math.floor(Date.now() / 1000);
 const context: ToolContext = { runId: 'run', step: 'step', idempotencyKey: 'key', signal: new AbortController().signal };
 const marker = `[fr3k:${createHash('sha256').update('key').digest('hex').slice(0, 24)}]`;
 const html = `<html><script>"videoDetails":{"videoId":"${videoId}","title":"Live build","isLiveContent":true}</script><script>"liveBroadcastDetails":{"isLiveNow":true}</script></html>`;
@@ -31,7 +32,7 @@ test('ntfy write is verified by exact topic read-back', async () => {
   const tool = setup((_url, init) => {
     if (init?.method === 'POST') {
       const body = JSON.parse(String(init.body));
-      event = { id: 'evt-1', event: 'message', topic, title: body.title, message: body.message };
+      event = { id: 'evt-1', event: 'message', topic, title: body.title, message: body.message, time: now };
       return json(event);
     }
     return response(`${JSON.stringify(event)}\n`);
@@ -44,7 +45,7 @@ test('ntfy write is verified by exact topic read-back', async () => {
 
 test('ntfy lost response reconciles once and duplicate marker fails closed', async () => {
   const input = { topic, title: 'Status', message: 'Stream verified' };
-  const stored = { id: 'evt-lost', event: 'message', topic, title: input.title, message: `${input.message}\n${marker}` };
+  const stored = { id: 'evt-lost', event: 'message', topic, title: input.title, message: `${input.message}\n${marker}`, time: now };
   let posts = 0;
   const lost = setup((_url, init) => {
     if (init?.method === 'POST') { posts++; throw new Error('response lost'); }
@@ -60,7 +61,7 @@ test('ntfy lost response reconciles once and duplicate marker fails closed', asy
 
 test('ntfy verifier tolerates bounded provider read-after-write lag', async () => {
   const input = { topic, title: 'Status', message: 'Stream verified' };
-  const stored = { id: 'evt-lagged', event: 'message', topic, title: input.title, message: `${input.message}\n${marker}` };
+  const stored = { id: 'evt-lagged', event: 'message', topic, title: input.title, message: `${input.message}\n${marker}`, time: now };
   let polls = 0;
   const tool = setup((_url, init) => {
     if (init?.method === 'POST') return json(stored);
@@ -70,4 +71,21 @@ test('ntfy verifier tolerates bounded provider read-after-write lag', async () =
   const result = await tool.execute(input, context);
   assert.equal((await tool.verify(input, context, result)).status, 'confirmed');
   assert.equal(polls, 2);
+});
+
+test('ntfy verifier reconciles an event older than the recent window via its publish time', async () => {
+  const input = { topic, title: 'Status', message: 'Stream verified' };
+  const old = now - 3600;
+  const stored = { id: 'evt-old', event: 'message', topic, title: input.title, message: `${input.message}\n${marker}`, time: old };
+  let since: string | null = null;
+  const tool = setup((url, init) => {
+    if (init?.method === 'POST') return json(stored);
+    since = new URL(url).searchParams.get('since');
+    const from = Number(since);
+    return response(Number.isFinite(from) && stored.time >= from ? `${JSON.stringify(stored)}\n` : '');
+  }).get('ntfy.publish_status');
+  const result = await tool.execute(input, context);
+  assert.equal((result as { sentAt: number }).sentAt, old);
+  assert.equal((await tool.verify(input, context, result)).status, 'confirmed');
+  assert.equal(since, String(old - 1));
 });
