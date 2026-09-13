@@ -300,31 +300,17 @@ Safety checks, traces, baseline evals, and local replay stay public.
 
 # Reference Multi-App Demo
 
-The judged reference path should be **one coherent workflow across 3+ apps**:
+The active direction is defined by [HACKATHON_DIRECTIVE.md](HACKATHON_DIRECTIVE.md).
 
-`GitHub → Google Drive / Sheets → Gmail → optional Google Calendar`
+The earlier Gmail/calendar reference workflow was rejected and must not be implemented. The judged workflow will still use at least three external apps, but each app must earn its place in a coherent, useful demonstration selected from verified authenticated capabilities.
 
-### Roles
+Before implementation, record:
 
-**GitHub**
-- mission intake
-- durable evidence record
-- task state
-
-**Drive / Sheets**
-- structured state
-- source documents
-- domain fixtures
-
-**Gmail**
-- approval-gated outbound action
-
-**Calendar**
-- verifiable follow-through
-
-The four worlds sit above this common execution/evidence layer.
-
----
+- the user problem;
+- the three or more necessary apps;
+- the observable action in each app;
+- the verification method;
+- the live-demo success criteria.
 
 # Demo UI
 
