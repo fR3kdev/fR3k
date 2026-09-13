@@ -1,13 +1,14 @@
 import { z } from 'zod';
-import type { MemoryEntry, Mission, Observation } from '../core/types.js';
+import type { Json, MemoryEntry, Mission, Observation } from '../core/types.js';
 
 /** A JSON-safe, bounded summary of planner context that a model provider may consume. */
 export interface BoundedPlannerPrompt {
   version: 1;
   mission: {
     id: string; goal: string; world: string;
-    allowedTools: string[]; maxAutonomy: number; maxWrites: number;
+    allowedTools: string[]; maxAutonomy: number; maxWrites: number; context: Json;
   };
+  tools?: Array<{ name: string; description: string; inputSchema: Json }>;
   observations: Array<{ seq: number; tool: string; value: unknown }>;
   memory: Array<Pick<MemoryEntry, 'world' | 'text' | 'source' | 'outcome'>>;
   eventsTail: Array<{ kind: string; step?: string }>;
@@ -17,12 +18,14 @@ export interface ModelPlannerProvider {
   id: string;
   /** Must return a value that `decisionSchema` accepts, or throw. */
   generate(prompt: BoundedPlannerPrompt, signal: AbortSignal): Promise<unknown>;
+  drainGenerations?(): Json[];
 }
 
 export const boundedModelSchema = z.strictObject({
   version: z.literal(1),
   mission: z.strictObject({
     id: z.string().min(1), goal: z.string().min(1), world: z.string().min(1),
+    context: z.json(),
     allowedTools: z.array(z.string()).min(1), maxAutonomy: z.number().int().nonnegative(), maxWrites: z.number().int().nonnegative(),
   }),
   observations: z.array(z.strictObject({ seq: z.number().int(), tool: z.string(), value: z.json() })).max(200),
@@ -79,6 +82,7 @@ export function boundPrompt(
     version: 1,
     mission: {
       id: mission.id, goal: mission.goal, world: mission.world,
+      context: mission.context,
       allowedTools: mission.policy.allowedTools, maxAutonomy: mission.policy.maxAutonomy, maxWrites: mission.policy.maxWrites,
     },
     observations: obs, memory: mem, eventsTail: tail,
@@ -94,6 +98,7 @@ export function guardProviderDecision(
 ): void {
   if (decision.kind === 'action') {
     const action = decision.action;
+    if (!prompt.mission.allowedTools.includes(action.tool)) throw new PlannerBoundaryError('TOOL_NOT_ALLOWED', 'Tool is outside the mission policy');
     const effect = toolEffect(action.tool);
     const allowed = effect === 'write' ? boundaries.allowedWriteTools : boundaries.allowedReadTools;
     if (!allowed.includes(action.tool)) throw new PlannerBoundaryError('TOOL_NOT_ALLOWED', `${action.tool} is not an allowed ${effect} tool`);

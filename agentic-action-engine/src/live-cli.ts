@@ -1,28 +1,8 @@
-import { randomUUID } from 'node:crypto';
-import { execFile } from 'node:child_process';
-import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
-import { createLiveIncidentMission } from './demo/live-incident-mission.js';
 import type { RunView } from './core/types.js';
-
-const execFileAsync = promisify(execFile);
-const repository = process.env.FR3K_REPOSITORY ?? 'fR3kdev/fR3k';
-const issueNumber = Number(process.env.FR3K_ISSUE_NUMBER ?? '1');
-const videoId = process.env.FR3K_YOUTUBE_VIDEO_ID ?? 'xKOL36Yjs0U';
-const ntfyTopic = process.env.FR3K_NTFY_TOPIC ?? `fr3k-live-${randomUUID().replaceAll('-', '').slice(0, 16)}`;
-const runId = process.env.FR3K_RUN_ID ?? `live-incident-${Date.now()}`;
-const root = process.env.FR3K_TRACE_ROOT ?? join(process.cwd(), '.work', 'live-traces');
-const actor = process.env.FR3K_OPERATOR ?? 'stream-operator';
-
-async function githubToken(): Promise<string> {
-  const configured = process.env.FR3K_GITHUB_TOKEN ?? process.env.GH_TOKEN;
-  if (configured) return configured;
-  const result = await execFileAsync('gh', ['auth', 'token'], { encoding: 'utf8' });
-  return result.stdout.trim();
-}
+import { openLiveIncident } from './live/incident-host.js';
 
 function render(view: RunView, after: number): number {
   for (const event of view.events.filter(event => event.seq > after)) {
@@ -53,9 +33,10 @@ async function approve(view: RunView): Promise<boolean> {
   finally { rl.close(); }
 }
 
-await mkdir(root, { recursive: true, mode: 0o700 });
-const live = createLiveIncidentMission({ root, runId, repository, issueNumber, videoId, ntfyTopic, githubToken });
-let view = await live.runtime.create(live.mission);
+const live = await openLiveIncident();
+const { runId, root, actor } = live;
+const ntfyTopic = live.target.ntfyTopic;
+let view = await live.runtime.inspect(runId);
 let rendered = 0;
 console.log('MISSION  Live Build Incident Agent');
 console.log('APPS     YouTube → GitHub → ntfy → GitHub evidence');

@@ -1,6 +1,7 @@
 import { createServer, type IncomingMessage } from "node:http";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
+import { modelMetrics } from '../model/metrics.js';
 import { identifier } from "../core/types.js";
 import type { DashboardBridge } from "./bridge.js";
 import { html, javascript, css } from "./assets.js";
@@ -115,8 +116,11 @@ export async function startDashboard({
         }
       };
       if (req.method === "GET" && !match[2])
-        return send(200, {
-          ...(await inspect()),
+        {
+          const view = await inspect();
+          return send(200, {
+          ...view,
+          modelMetrics: modelMetrics(view.events),
           dashboard: {
             resuming: active.has(id),
             resumeError: errors.get(id) ?? null,
@@ -124,6 +128,7 @@ export async function startDashboard({
             reconcileError: reconcileErrors.get(id) ?? null,
           },
         });
+        }
       if (req.method === "POST" && match[2] === "approval") {
         const input = z
           .strictObject({
