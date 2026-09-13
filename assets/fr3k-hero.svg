@@ -1,0 +1,81 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">fR3k Open Code Drop</title>
+  <desc id="desc">Cyberpunk banner for the fR3k public code repository featuring Qwen on 4 GB VRAM, agent tools, experiments and a live build stream.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#020611"/>
+      <stop offset="0.45" stop-color="#081B3A"/>
+      <stop offset="1" stop-color="#16082D"/>
+    </linearGradient>
+    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#4EF2FF"/>
+      <stop offset="0.48" stop-color="#7266FF"/>
+      <stop offset="1" stop-color="#FF4DD8"/>
+    </linearGradient>
+    <linearGradient id="hot" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#FF315F"/>
+      <stop offset="1" stop-color="#FF7A2E"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#09152B" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#07101D" stop-opacity="0.88"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" rx="30" fill="url(#bg)"/>
+  <rect x="16" y="16" width="1248" height="688" rx="24" stroke="url(#neon)" stroke-opacity="0.42"/>
+
+  <g opacity="0.18">
+    <path d="M0 568C158 512 282 522 392 468C543 394 634 300 801 304C951 307 1060 431 1280 386V720H0V568Z" fill="#41D9FF"/>
+    <path d="M0 626C177 587 278 603 446 523C581 458 684 369 832 377C1005 386 1084 500 1280 480V720H0V626Z" fill="#9D55FF"/>
+  </g>
+
+  <g opacity="0.30">
+    <rect x="780" y="164" width="15" height="318" fill="#50EFFF"/>
+    <rect x="826" y="108" width="20" height="374" fill="#3DAEFF"/>
+    <rect x="879" y="216" width="12" height="266" fill="#8D67FF"/>
+    <rect x="920" y="184" width="25" height="298" fill="#39D8FF"/>
+    <rect x="978" y="138" width="18" height="344" fill="#6A76FF"/>
+    <rect x="1030" y="236" width="13" height="246" fill="#50EFFF"/>
+    <rect x="1076" y="168" width="23" height="314" fill="#A557FF"/>
+    <rect x="1132" y="222" width="15" height="260" fill="#50EFFF"/>
+    <rect x="1182" y="188" width="11" height="294" fill="#6A76FF"/>
+  </g>
+
+  <text x="72" y="132" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="108" font-weight="900" letter-spacing="1">fR3k</text>
+  <text x="76" y="172" fill="#C8A6FF" font-family="Arial,Helvetica,sans-serif" font-size="29" font-weight="800">OPEN CODE DROP</text>
+  <text x="76" y="212" fill="#91B8FF" font-family="Arial,Helvetica,sans-serif" font-size="23">Useful code • weird experiments • measured results • built in public</text>
+
+  <g>
+    <rect x="72" y="252" width="570" height="92" rx="18" fill="#0A0E19" stroke="url(#hot)" stroke-width="2"/>
+    <circle cx="112" cy="298" r="13" fill="#FF355F" filter="url(#glow)"/>
+    <text x="144" y="289" fill="#FF6A7C" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="900">LIVE NOW ON YOUTUBE</text>
+    <text x="144" y="319" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700">Multi-App AI Agent Hackathon • full build stream</text>
+  </g>
+
+  <g>
+    <rect x="72" y="378" width="520" height="188" rx="22" fill="url(#panel)" stroke="#46E8FF" stroke-opacity="0.55"/>
+    <text x="98" y="420" fill="#5BEAFF" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="900">HEADLINE GIVEAWAY</text>
+    <text x="98" y="465" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="40" font-weight="900">QWEN 35B-A3B</text>
+    <text x="98" y="505" fill="#D7E7FF" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="800">ON A 4 GB VRAM MACHINE</text>
+    <text x="98" y="540" fill="#8FB9EE" font-family="Arial,Helvetica,sans-serif" font-size="18">5.71 tok/s peak • 3,063 MB peak VRAM • raw evidence included</text>
+  </g>
+
+  <g>
+    <rect x="620" y="378" width="572" height="188" rx="22" fill="url(#panel)" stroke="#9A68FF" stroke-opacity="0.55"/>
+    <text x="646" y="420" fill="#C79FFF" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="900">MORE GOOD STUFF</text>
+    <text x="646" y="462" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800">⚡ LLM cost router</text>
+    <text x="646" y="495" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800">🧪 reproducible benchmarks</text>
+    <text x="646" y="528" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800">🧠 agent / MCP / eval utilities</text>
+  </g>
+
+  <g>
+    <rect x="72" y="600" width="1120" height="72" rx="18" fill="#07101A" stroke="url(#neon)" stroke-opacity="0.42"/>
+    <text x="102" y="645" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="900">TAKE IT. FORK IT. BREAK IT. MAKE IT BETTER.</text>
+    <text x="858" y="645" fill="#55E9FF" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="800">BUILD → MEASURE → SHARE → REPEAT</text>
+  </g>
+</svg>
