@@ -302,15 +302,9 @@ Safety checks, traces, baseline evals, and local replay stay public.
 
 The active direction is defined by [HACKATHON_DIRECTIVE.md](HACKATHON_DIRECTIVE.md).
 
-The earlier Gmail/calendar reference workflow was rejected and must not be implemented. The judged workflow will still use at least three external apps, but each app must earn its place in a coherent, useful demonstration selected from verified authenticated capabilities.
+The verified judged workflow is YouTube → GitHub → ntfy → GitHub evidence: observe stream state, ground the incident, send an approved operator notification, and append approved evidence after read-back. Each write requires exact approval and independent verification. See the [mission evidence](evidence/LIVE_MISSION_2026-09-14.md) for the successful run and receipt-visibility failure/recovery.
 
-Before implementation, record:
-
-- the user problem;
-- the three or more necessary apps;
-- the observable action in each app;
-- the verification method;
-- the live-demo success criteria.
+The earlier Gmail/calendar reference workflow remains rejected. The four-world sections above describe the broader roadmap; Arga is implemented as a sandbox, while Lemma, Comma Capital and Userlens remain planned.
 
 # Demo UI
 

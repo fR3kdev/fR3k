@@ -33,24 +33,18 @@
 }
 ```
 
-## Translation — video flag → Ollama parameter
+## Configuration interpretation
 
-| video flag | Ollama equivalent | this rig |
-|-----------|------------------|---------|
-| `--n-cpu-moe N` | `num_gpu` (inverse) — Ollama auto-fits 11/41 layers | auto |
-| `--no-mmap` | `use_mmap false` | **on** (winner) |
-| `--mlock` | `use_mlock true` | on |
-| `--ctx-size N` | `num_ctx N` | 4096 (winner); proven to 16384 |
-| `--cache-type-k q4_0 --cache-type-v q3_0` (TurboQuant) | env `OLLAMA_KV_CACHE_TYPE=q4_0` | q8_0 winner here |
+The sweep uses Ollama `num_gpu`, `num_ctx`, `use_mmap`, `use_mlock`, and the service-level `OLLAMA_KV_CACHE_TYPE` setting. These are the settings represented in the retained configuration and result files. The retained sweep does not include a CPU-expert-offload comparison or a TurboQuant benchmark.
 
-## Findings vs the video
+## Findings and limits
 
-- **Video baseline (GTX 1060 6GB):** 17 t/s peak, 256K ctx.
-- **This rig (T1000 4GB):** 5.71 t/s peak, ~16K ctx achievable.
-- T1000 has **66% less VRAM** + 75% lower memory bandwidth (192 vs 768 GB/s class) → roughly 1/3 the throughput. Result tracks the bandwidth ratio cleanly.
-- **No-mmap wins by 2-4%** even with 32GB RAM — confirms the video's mechanism (avoiding cold expert page-faults).
-- **q4_0 KV cache (TurboQuant-style)** loses ~3-4% vs q8_0 on this hardware (q8_0 winner). Likely because the T1000 lacks the memory pressure where KV compression pays off.
-- **All KV cache types and contexts pass 3/3 correctness** — no silent quality loss observed in short suite.
+- The highest recorded generation rate is **5.71 tok/s**, with **5.57 tok/s** mean generation for `auto_4k_q8_no_mmap`.
+- Compared with `auto_4k_q8`, the no-mmap configuration has about **2.1% higher peak** and **1.8% higher mean** generation. The sweep does not isolate cache warmth or page-fault behavior, so it does not establish why this configuration was faster.
+- At 4K context with mmap enabled, q8 has about **4.1% higher peak** and **2.2% higher mean** generation than q4 in the recorded results. This is specific to the measured short workload.
+- Configured context sizes reached 16,384, but the three short prompts do not establish long-context quality or performance.
+- Every configuration passed the same three checks; this does not establish general model quality or absence of quality loss.
+- This is CPU/RAM plus partial GPU offload on a 32 GB RAM workstation. The model is not wholly resident in 4 GB VRAM. No controlled cross-GPU comparison is included, so bandwidth or VRAM alone cannot explain a performance ratio against another rig.
 
 ## Extension path
 
@@ -59,7 +53,7 @@ The harness is rig-agnostic. Add a hardware-specific grid, run the same short su
 ## Files
 
 - Harness: `harness/launch_ollama.sh`, `harness/bench_ollama.py`, `harness/sweep_ollama.py`
-- Grids: `configs/workstation.grid.json`, `configs/3060ti-host.grid.json`
-- Gold prompts: `bench/gold/short.json`, `bench/gold/medium_recall.json`, `bench/gold/long_codebase.json`
+- Grids: `configs/workstation.grid.json`
+- Gold prompts: `bench/gold/short.json`
 - Raw results: `results/workstation_20260506_033245.json`
 - Optimal config (this rig): `configs/workstation.json`

@@ -30,4 +30,4 @@ That race became a regression test. The verifier now performs bounded read-back 
 
 Live run `live-incident-1789331116305` finished **`CONFIRMED_SUCCESS`** with evaluator score **1.00**. All seven checks passed: exact YouTube stream, canonical GitHub issue, ntfy receipt, GitHub evidence receipt, runtime policy, runtime verification and runtime grounding.
 
-The integrated suite now passes **80/80 tests** on current `main`, including lost responses, duplicate markers, wrong identity, policy denial, crash recovery, replay and adversarial cases.
+The integrated suite passes **80/80 tests** at submission baseline `f488f55`, including lost responses, duplicate markers, wrong identity, policy denial, crash recovery, replay and adversarial cases.

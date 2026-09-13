@@ -1,11 +1,9 @@
 """
 router.py — classify task complexity, return a model + tier decision.
 
-Two-stage classifier:
-  1. Cheap heuristics (length, code/math keywords, reasoning markers).
-     This handles ~80% of cases for free with no LLM call.
-  2. Optional LLM tie-breaker on the cheap model when heuristic confidence
-     is low. Disabled by default; enable with use_llm_classifier=True.
+Heuristic classifier using prompt length, code keywords and reasoning markers.
+Routing makes no LLM call; an optional LLM tie-breaker is not implemented.
+Length thresholds use whitespace-separated word counts as a token proxy.
 
 Thresholds are intentionally exposed so they can be tuned per deployment.
 A router that nobody can tune is a router that gets ripped out in week 3.

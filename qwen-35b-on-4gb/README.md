@@ -25,7 +25,7 @@ Winning Ollama configuration:
 }
 ```
 
-On this 4 GB GPU, disabling mmap improved peak generation by roughly 2–4%. Q8 KV cache beat Q4 for the measured short workload; the constrained card did not benefit enough from KV compression to offset its cost.
+In the recorded 4K/q8 comparison, the no-mmap configuration achieved 5.71 versus 5.59 peak tokens/s (about 2.1% higher). Q8 beat Q4 in the recorded 4K configurations. These short-suite results do not isolate the mechanism or establish a general advantage across workloads.
 
 ## Hardware and runtime
 
@@ -48,17 +48,24 @@ On this 4 GB GPU, disabling mmap improved peak generation by roughly 2–4%. Q8 
 
 ## Reproduce
 
+From `qwen-35b-on-4gb/`:
+
 ```bash
+python3 harness/preflight.py
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ollama pull huihui_ai/Qwen3.6-abliterated:35b-a3b
-python3 harness/sweep_ollama.py \
+ALLOW_SYSTEM_OLLAMA_CHANGES=1 .venv/bin/python harness/sweep_ollama.py \
   --rig workstation \
   --grid configs/workstation.grid.json \
   --suites short
 ```
 
+The sweep can change and restart the local Ollama systemd service to test KV-cache settings. Review `harness/launch_ollama.sh` before using the explicit `ALLOW_SYSTEM_OLLAMA_CHANGES=1` opt-in.
+
 ## Measurement boundaries
+
+- The model uses CPU/system RAM plus partial GPU offload; the 22.3 GiB model does not fit entirely in 4 GB VRAM.
 
 - This is a constrained-hardware engineering sweep, not a general model-quality benchmark.
 - Correctness is limited to the included three-item short suite.

@@ -2,6 +2,16 @@
 
 **Status: ACTIVE — highest priority**
 
+## Judged live mission verified — 2026-09-14
+
+The headline judged path is now **YouTube → GitHub → ntfy → GitHub evidence**. This supersedes the earlier statement that live three-app selection was still gated.
+
+Verified run `live-incident-1789331116305` reached `CONFIRMED_SUCCESS` / evaluator `1.00`. YouTube live state and GitHub issue #1 were observed before any write. The ntfy notification and GitHub evidence comment each required an exact operator approval and were independently read back. Evidence comment: https://github.com/fR3kdev/fR3k/issues/1#issuecomment-5655933189.
+
+The Arga Support/Billing/CRM path remains a valuable `SIMULATION_ONLY` reliability fixture, not the headline external-app proof.
+
+The earlier mission and delivery sections below preserve the sequence of decisions. Their capability inventories and uncompleted gates describe those earlier stages, not the current live path.
+
 ## Immediate instruction
 
 All GPD/Hermes development work unrelated to the Multi-App AI Agent Hackathon is paused. Preserve existing branches, working trees, logs and evidence; do not discard or overwrite unrelated work.
@@ -38,7 +48,7 @@ Build and demonstrate one coherent agent that:
 7. Verify the real workflow, capture evidence and prepare the live demo.
 8. Only then improve polish, secondary scenarios or reusable abstractions.
 
-## Recorded mission decision — 2026-09-14
+## Historical first mission decision — 2026-09-14
 
 Capability inventory observed before implementation:
 
@@ -64,7 +74,7 @@ The mission is now recorded. Implementation may proceed on this vertical slice a
 
 A task is complete only when the repository records the commit, tests actually run, live app read/write/read-back evidence where applicable, known limitations and exact demo steps.
 
-## Concurrent delivery scope — 2026-09-14
+## Historical concurrent delivery scope — 2026-09-14
 
 The user requested both development jobs concurrently, integrated to `main`.
 The shared baseline is `ab2be86`. Jobs use isolated Git worktrees because the runtime is now committed.
@@ -74,11 +84,3 @@ The shared baseline is `ab2be86`. Jobs use isolated Git worktrees because the ru
 - Main integration: run combined tests, typecheck and sandbox demo, add runtime CI, review and publish both deliveries to `main`.
 
 Acceptance is contract-tested GitHub adapters plus a browser-verified dashboard operating the real sandbox runtime. Live external-app verification, checkpoint replay and process-crash recovery remain separate gates. Gmail and Calendar remain excluded.
-
-## Judged live mission verified — 2026-09-14
-
-The headline judged path is now **YouTube → GitHub → ntfy → GitHub evidence**. This supersedes the earlier statement that live three-app selection was still gated.
-
-Verified run `live-incident-1789331116305` reached `CONFIRMED_SUCCESS` / evaluator `1.00`. YouTube live state and GitHub issue #1 were observed before any write. The ntfy notification and GitHub evidence comment each required an exact operator approval and were independently read back. Evidence comment: https://github.com/fR3kdev/fR3k/issues/1#issuecomment-5655933189.
-
-The Arga Support/Billing/CRM path remains a valuable `SIMULATION_ONLY` reliability fixture, not the headline external-app proof.

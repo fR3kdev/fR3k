@@ -1,9 +1,10 @@
 """
 Per-million-token pricing for ~10 commonly-routed models.
 
-Prices in USD per 1M tokens, captured Nov 2026 from public provider pages
-and OpenRouter. Update freely — pricing is the most volatile part of this
-stack. Cost calculations consume these dicts directly.
+Illustrative USD rates per 1M tokens inherited from the original router demo.
+The repository does not establish a verified capture date or current provider
+pricing. Confirm rates and model identifiers before production use.
+Cost calculations consume these dictionaries directly.
 """
 
 # (input_per_million, output_per_million)

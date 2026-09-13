@@ -1,6 +1,6 @@
 # Developer handover — fR3k hackathon build
 
-Prepared 2026-09-14, Australia/Brisbane. This is the current handover after the concurrent connector/dashboard jobs **and** the subsequent gap-fill session (crash recovery, replay/counterfactual runner, hardened Arga evidence). Read this document and `HACKATHON_DIRECTIVE.md` before continuing. `HANDOFF_MANIFEST.md` is historical: its uncommitted-runtime and unstarted-agent statements no longer describe this checkout.
+Updated 2026-09-14, Australia/Brisbane, against submission baseline `f488f55`. This handover covers the integrated runtime, verified live mission, subsequent hardening and published submission. Read this document and `HACKATHON_DIRECTIVE.md` before continuing. `HANDOFF_MANIFEST.md` is historical: its uncommitted-runtime and unstarted-agent statements no longer describe this checkout.
 
 ## 1. Outcome and immediate objective
 
@@ -67,7 +67,7 @@ Preserve unrelated local changes and other workloads. Do not reset, clean or ove
 | Live incident mission | `src/connectors/incident.ts`, `src/demo/live-incident-mission.ts`, `src/live-cli.ts` | Real YouTube + GitHub + ntfy workflow with exact approval before both writes, reconcile-only semantics, read-after-write verification, evaluator score 1.00 on the verified run. |
 | CLI demo | `src/cli.ts` | Runs the mission, then prints crash replay and v1 counterfactual; automatically approves sandbox actions as `demo-operator`; never use this as the approval design for live actions. |
 | GitHub adapters | `src/connectors/index.ts` | Issue read and evidence comment write, fixed origin, repository allowlist, sanitized faults, exact reconciliation. |
-| Dashboard contract | `src/dashboard/bridge.ts` | Injected list, inspect, approve, resume and compare bridge. |
+| Dashboard contract | `src/dashboard/bridge.ts` | Injected list, inspect, approve, resume, reconcile and compare bridge. |
 | Dashboard server/UI | `src/dashboard/server.ts`, `assets.ts` | Loopback API, protected mutations, evidence/trace/approval/evaluation/comparison UI. |
 | Dashboard fixtures | `src/dashboard/fixture.ts` | Synthetic success/failure/expired/unavailable/uncertain cases, visibly marked fixture mode. |
 | Actual runtime bridge | `src/demo/dashboard-bridge.ts` | Delegates to explicitly attached Runtime instances; no independent permission logic or direct tool writes. |
@@ -94,9 +94,10 @@ These adapters are wired into the live incident launcher with an exact repositor
 | Route | Purpose |
 | --- | --- |
 | `GET /api/runs` | List attached runs |
-| `GET /api/runs/:id` | Inspect RunView; includes `dashboard.resuming` and `dashboard.resumeError` |
+| `GET /api/runs/:id` | Inspect RunView; includes resume/reconcile progress and error fields |
 | `POST /api/runs/:id/approval` | Exact `{ digest, allow }`; actor cannot be supplied by browser |
 | `POST /api/runs/:id/resume` | Empty object; queues execution, returns 202, rejects overlapping resumes |
+| `POST /api/runs/:id/reconcile` | Empty object; queues verifier-only reconciliation for a failed run with a pending write; returns 202 and rejects overlap |
 | `GET /api/compare?baseline=...&candidate=...` | Compare bridge-provided metrics |
 
 Mutations require exact Origin, strict JSON, a random token header and valid Host. The server rejects oversized bodies, hostile paths and cross-origin requests; the browser renders untrusted text via text nodes under CSP. It loads no external scripts/fonts. This is a local operator interface, not multi-user authentication or an externally deployable service.
@@ -113,9 +114,9 @@ npm ci
 npm run typecheck
 npm test
 npm run demo
-npm run dashboard
-npm run demo:live
 ```
+
+For the local Arga UI, run `npm run dashboard` and follow the steps below. Run the external-app CLI separately after following the [runtime configuration guide](../agentic-action-engine/README.md).
 
 `npm run demo:live` is the judged external-app path. It reads the exact YouTube stream and GitHub issue, then prompts for each real write. Do not set `FR3K_APPROVE=1` for ordinary demos unless the exact ntfy topic/message and GitHub evidence comment have already been reviewed and authorized.
 
@@ -143,7 +144,7 @@ Do not run both launchers on the default port simultaneously. The verification s
 | Check | Observed result |
 | --- | --- |
 | Clean dependency install | Passed, Node 22 |
-| Combined `npm test` | **77 passed, 0 failed, 0 skipped** on the integrated live branch |
+| Combined `npm test` | **80 passed, 0 failed, 0 skipped** at submission baseline `f488f55`; the recorded live mission/video snapshot had 77 |
 | `npm run typecheck` | Passed |
 | `npm run demo` | `CONFIRMED_SUCCESS`, evaluator 1.00; replay candidate `CONFIRMED_SUCCESS` score 1.00 with zero regressions; v1 counterfactual listed the three proofs it never evaluates; durable-outcome reconstruction line; 8-variant adversarial panel all PASS |
 | `npm run demo-live` | Existing read-only GitHub attach still passes; separate judged `npm run demo:live` completed the real YouTube → GitHub → ntfy → GitHub evidence mission at `CONFIRMED_SUCCESS`, score 1.00 |
@@ -153,7 +154,7 @@ Do not run both launchers on the default port simultaneously. The verification s
 | Bounded planner cases | 8 tests: happy path to independent green; forbidden-tool injection; ghost evidence ref; write without evidence; finish without evidence; provider hang; fail-closed credentials; ref-budget guard |
 | Adversarial variant cases | 2 tests: all 8 variants hold invariants (partial-refund bug fixed); every variant ends terminal/policy state |
 | Connector cases | 14 passing tests: validation, allowlisting, fault sanitization, rate limiting, abort, pagination, duplicate/wrong markers, exact read-back, lost response, no blind retry |
-| Dashboard API cases | 2 tests containing multiple assertions: actor binding, stale/expired approvals, allow/deny, asynchronous resume, overlap, background errors, Origin/Host/token/path/body limits |
+| Dashboard API cases | Contract tests including verifier-only reconciliation, overlap/ineligible-run guards, and multiple assertions: actor binding, stale/expired approvals, allow/deny, asynchronous resume, overlap, background errors, Origin/Host/token/path/body limits |
 | Actual bridge | 1 integration test: real Arga success versus denial, stale digest, approval does not execute, comparisons and unknown metrics |
 | Fixture Chromium | Keyboard approval/resume/denial, expired refresh, comparisons, unavailable/uncertain/failure/success, literal injection text, mobile layout, no page JS errors |
 | Actual-runtime Chromium | Keyboard approval/denial, separate resumes, completed versus denied state, comparisons, sidebar status updates, 390px mobile without page overflow, no page JS errors |
@@ -194,7 +195,7 @@ The following items from the previous handover are **resolved** and covered by t
 - Unrelated-charge invariant preserved via an explicit post-refund read-back of CHG-89 and an evaluator check that no CHG-89 refund exists.
 - `reconstructArgaState(events, seed)` rebuilds Arga app state from the durable journal.
 
-**Remaining for the mission:** the mission planner `arga-planner-v2` is deterministic and emergency-drives incident/charge IDs from closure state (full history of the bounded model-backed `src/model/` design is shipped, but no live API key is set, so no model-backed run has been certified). The `npm run dashboard` launcher still creates fresh in-memory app state on startup; the replay runner (not the dashboard) is the crash-recovery path today. Live GitHub reads and the approval-gated evidence write are proven in the three-app mission. The Arga dashboard itself remains synthetic; do not conflate that UI fixture with the external-app proof.
+**Remaining for the mission:** the mission planner `arga-planner-v2` is deterministic and takes incident/charge IDs from closure state. The live incident planner is also deterministic. The bounded model-provider interface in `src/model/` requires explicit host wiring and credentials; no live model-backed run has been certified. The `npm run dashboard` launcher still creates fresh in-memory app state on startup; the replay runner (not the dashboard) is the crash-recovery path today. Live GitHub reads and the approval-gated evidence write are proven in the three-app mission. The Arga dashboard itself remains synthetic; do not conflate that UI fixture with the external-app proof.
 
 ### P0/P1: runtime crash and retry boundaries — completed in the gap-fill session
 
@@ -225,17 +226,17 @@ The UI is functional and browser-tested, but uses large embedded JavaScript/CSS 
 
 ### P2: expand only after one complete vertical slice
 
-See `PLAN.md` for Lemma, Comma Capital, Arga Labs adversarial variants and Userlens. The full domain scenarios, replay-backed repair proof, a live model-backed planner run and judged demo polish are unfinished. Do not mark them complete based on this dashboard delivery.
+See `PLAN.md` for Lemma, Comma Capital, Arga Labs adversarial variants and Userlens. Lemma, Comma Capital and Userlens scenarios, replay-backed repair proof, and a live model-backed planner run remain unfinished. Arga and its eight variants are verified as sandbox regression assets; the judged CLI mission and submission media are published.
 
 ## 8. Suggested execution order for the successor
 
-1. Observe Git state and current Actions results. Read the directive and this handover; treat old manifests as history.
-2. Reproduce the 70-test/typecheck/demo baseline in a clean install. Run browser acceptance if modifying UI or bridge behavior.
-3. Inventory live capabilities and record exact mission/resource acceptance before any live write integration.
-4. The durable side-effect/recovery semantics, billing evidence, outcome memory, bounded model planner and adversarial variants are now proven in sandbox (see the marked-complete P0 sections); keep them as regression fixtures while attaching the necessary real adapters and a model-backed run to the existing runtime and dashboard, preserving approval separation.
-5. Verify a single real three-app mission and its forbidden-effects checks with retained source evidence; live GitHub reads are the proven anchor today, live writes await operator approval and exact targets.
-6. Demonstrate a failing baseline and justified passing candidate using `replay-bridge.ts` for a different model/policy/adapter revision.
-7. Update `STATUS.md`, `COMPLETION.md`, `BUILD_LOG.md`, demo instructions and this handover with actual evidence, limitations and commit IDs. Keep old dated verification snapshots clearly historical.
+1. Observe Git state and Actions results; treat old manifests as history.
+2. Reproduce the 80-test submission baseline with a clean install, typecheck and sandbox demo. Repeat browser acceptance when changing UI or bridge behavior.
+3. Preserve the recorded live mission and exact approval/read-back boundaries. Configure targets and approvals for any new live run; the earlier receipts do not authorize another notification or comment.
+4. If adding a model-backed showcase, wire the bounded provider into a host explicitly and verify its output against the same policy/evidence constraints.
+5. Connect and verify live-provider dashboard control if needed; keep sandbox replay and live-provider evidence clearly identified.
+6. Add a failing baseline and justified passing candidate for new revision comparisons, retaining source evidence.
+7. Update the status, ledger, log and handover with actual checks and limitations. Preserve dated historical results.
 
 ## 9. Key references
 
@@ -251,4 +252,4 @@ See `PLAN.md` for Lemma, Comma Capital, Arga Labs adversarial variants and Userl
 
 Implementation was published to `origin/main`, including connector `9d46a36`, dashboard `a220838`, integration `81f034e`, handover `dc2b222`, and the gap-fill batch `7fb5b77`/`f6bfff4` (crash recovery + replay) followed by `dc647ad` (durable outcomes, bounded model planner, adversarial variants, live GitHub attach). Another writer updated the livestream links during development; those commits (`96f3706`, `7867199`) were preserved with merge `f3553d9`, with no force push. `git ls-remote` confirmed `origin/main` after publication; the working tree was clean.
 
-Local checks passed as recorded above. New GitHub CI results were not yet observed when this publication record was written. Inspect https://github.com/fR3kdev/fR3k/actions for `validate-agent-runtime` and `validate-qwen-4gb-kit` on the current commit. Do not mistake earlier successful Qwen-only checks for runtime validation.
+Subsequent publication includes the verified live mission (`a7c7649`) and submission bundle. At submission baseline `f488f55`, both [agent runtime CI](https://github.com/fR3kdev/fR3k/actions/runs/34784442065) and [Qwen kit CI](https://github.com/fR3kdev/fR3k/actions/runs/34784442078) passed. The runtime job runs clean install, typecheck, all 80 tests and the sandbox demo. Inspect Actions again for later revisions; these links certify the named baseline.

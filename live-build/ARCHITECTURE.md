@@ -51,46 +51,29 @@ A compact runtime that can execute the same control loop in very different busin
                   └────────────────────┘
 ```
 
-## Planned implementation shape
+## Implemented layout
+
+Paths below are relative to `agentic-action-engine/`:
 
 ```text
 src/
-  core/
-    orchestrator.ts
-    state-machine.ts
-    planner.ts
-    types.ts
-  tools/
-    registry.ts
-    contracts.ts
-    idempotency.ts
-  policy/
-    engine.ts
-    autonomy.ts
-  memory/
-    store.ts
-    retrieval.ts
-  trace/
-    events.ts
-    jsonl.ts
-  eval/
-    evaluator.ts
-    assertions.ts
-  replay/
-    runner.ts
-    compare.ts
-  connectors/
-    github/
-    google-drive/
-    google-sheets/
-    gmail/
-    google-calendar/
-  worlds/
-    lemma/
-    comma/
-    arga/
-    userlens/
+  core/          # orchestrator, state machine, mission/decision types
+  tools/         # registry, typed contracts and verification metadata
+  policy/        # allowlists, autonomy and write budgets
+  memory/        # in-memory retrieval and durable outcome store
+  trace/         # JSONL integrity, repair and locking
+  eval/          # trajectory and evidence evaluator
+  model/         # bounded planner and provider interfaces
+  connectors/    # index.ts: GitHub; incident.ts: YouTube and ntfy
+  live/          # read-only GitHub attach
+  dashboard/     # bridge contract, server, UI and fixtures
+  demo/          # Arga, variants, replay, dashboard and live mission hosts
+  cli.ts         # sandbox demo
+  cli-live.ts    # GitHub read-only launcher (demo-live)
+  live-cli.ts    # three-app launcher (demo:live)
 ```
+
+The four worlds remain a product roadmap: Arga has sandbox implementations, while Lemma, Comma Capital and Userlens are planned. Google/Gmail/Calendar connectors are excluded by the [active directive](HACKATHON_DIRECTIVE.md). The model provider boundary exists but shipped demos use deterministic planners; live model execution still needs host integration and verification.
 
 TypeScript owns orchestration and contracts. Python is reserved for analysis/evaluation where its ecosystem is materially better, exposed through a small process or API boundary rather than creating two competing runtimes.
 
