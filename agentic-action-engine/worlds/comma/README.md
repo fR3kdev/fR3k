@@ -1,18 +1,13 @@
-# Comma World — Portfolio Support / Operator Matching
+# Comma world — portfolio intervention engine
 
-## Goal
-Convert a portfolio-company problem into a grounded diagnosis, ranked operator matches, approval-gated outreach, and measurable follow-through.
+A proposed portfolio-support capability for an early-stage investor: turn a founder problem into a grounded diagnosis, rank the best people/interventions from the network, gate outreach behind approval, schedule accepted help, and record outcomes so institutional memory compounds.
 
-## Flow
-1. Inspect company metrics and founder problem statement.
-2. Separate symptom from bottleneck.
-3. Search operator/relationship graph.
-4. Retrieve prior interventions in analogous situations.
-5. Rank candidates with transparent evidence.
-6. Draft outreach.
-7. Require approval before sending.
-8. Track acceptance and schedule follow-up.
-9. Record outcome so future matching improves.
+**Full build contract:** [`SPEC.md`](SPEC.md)
 
-## Demo success
-The selected operators must match the diagnosed bottleneck, outbound communication must respect approval policy, and accepted help must produce a verifiable calendar/action record.
+Core loop:
+
+`founder need → metric-backed bottleneck → similar cases → helper ranking → approval → intro → follow-up → outcome → institutional memory`
+
+Key rule: diagnose the business bottleneck before matching people. The system must explain why a helper is relevant and learn from what happened after the introduction.
+
+Public firm reference: https://comma.vc/

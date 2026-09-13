@@ -1,22 +1,13 @@
-# Lemma World — Autonomous Investment Thesis Monitor
+# Lemma world — semantic failure → verified repair
 
-## Goal
-Turn a new filing/earnings/news event into a grounded thesis-impact assessment and a reviewable valuation update.
+Lemma's real product surface is production monitoring and reliability for AI agents. This world starts from a production semantic failure and carries it through diagnosis, a minimal repair, regression creation, replay, and a reviewable GitHub PR.
 
-## Flow
-1. Load current thesis and assumptions.
-2. Retrieve the triggering source document.
-3. Extract material evidence with citations.
-4. Map evidence to explicit thesis assumptions.
-5. Recompute only affected valuation inputs.
-6. Compare valuation delta.
-7. Produce an evidence-backed journal event.
-8. Notify for review when materiality exceeds policy threshold.
+**Full build contract:** [`SPEC.md`](SPEC.md)
 
-## Safety
-- Research and calculations may be autonomous.
-- Valuation changes are proposed/reviewable.
-- Trading is prohibited.
+Core loop:
 
-## Demo success
-The evaluator verifies that the cited source supports the claimed change, the correct assumption was modified, the valuation delta is reproducible, and no trade occurred.
+`incident → representative traces → violated requirement → root cause → minimal patch → baseline fail → candidate pass → PR → approval → online eval`
+
+Key rule: a technically successful trace can still be a semantic failure. The evaluator judges the external state and the requirement that was actually in force, not the agent's final prose.
+
+Public product reference: https://www.uselemma.ai/

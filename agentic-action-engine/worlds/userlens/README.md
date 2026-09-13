@@ -1,18 +1,13 @@
-# Userlens World — Autonomous Customer Adoption Agent
+# Userlens world — intervention policy that learns
 
-## Goal
-Choose and measure product-adoption interventions based on observed behaviour rather than merely generating marketing copy.
+Userlens/Lumi already combines account state with product behavior to decide who needs guidance and why. This world extends that into a measurable policy loop: choose a bounded treatment, execute it, observe the downstream behavior, estimate incremental effect, and update future decisions only when the evidence is strong enough.
 
-## Flow
-1. Inspect account and product-usage state.
-2. Infer unmet workflow from behaviour.
-3. Retrieve similar historical cases.
-4. Generate candidate interventions.
-5. Apply risk/exposure policy.
-6. Assign approved cohort/treatment.
-7. Trigger communication/product action.
-8. Observe downstream behaviour.
-9. Estimate treatment effect and update intervention memory.
+**Full build contract:** [`SPEC.md`](SPEC.md)
 
-## Demo success
-The agent must choose an intervention because of grounded behavioural evidence, respect cohort limits, and measure a post-action outcome against a control/baseline.
+Core loop:
+
+`account state + behavior → treatment candidates → policy/guardrails → bounded action → outcome → uplift estimate → policy update`
+
+Key rule: personalized copy is not the product. The system must show whether the intervention changed behavior without violating consent, support, exposure, or retention guardrails.
+
+Public product reference: https://userlens.io/

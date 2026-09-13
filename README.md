@@ -6,9 +6,16 @@ Useful, runnable code shared live during the Multi-App AI Agent Hackathon. Fork 
 
 ## Agentic Action Engine
 
-[`agentic-action-engine/`](agentic-action-engine/) is the public specification for the live competition build: one reusable evidence-first agent runtime adapted to Lemma, Comma Capital, Arga Labs, and Userlens. It is designed around observable traces, grounded state, policy-gated actions, verification after writes, evaluation, and replay.
+[`agentic-action-engine/`](agentic-action-engine/) is the live competition build hub: one reusable evidence-first runtime for agents that inspect state, take policy-bounded actions across external apps, read the resulting state back, and independently verify whether the mission actually succeeded.
 
-The initial public drop is intentionally architecture/specification only. Contest implementation begins in the official build window and will evolve live on stream.
+The four company worlds now map to the companies' real current product surfaces:
+
+- **Lemma AI:** production semantic failure → verified repair/regression loop
+- **Comma Capital:** founder need → network intervention → measured institutional memory
+- **Arga Labs:** failure → deterministic sandbox scenario → counterfactual regression gate
+- **Userlens:** customer behavior → bounded treatment → measured adoption/uplift loop
+
+Start with [`agentic-action-engine/README.md`](agentic-action-engine/README.md) and [`agentic-action-engine/docs/COMPANY_FIT.md`](agentic-action-engine/docs/COMPANY_FIT.md).
 
 ## Headline giveaway: a 35B-A3B Qwen model on 4 GB VRAM
 

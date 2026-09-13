@@ -1,65 +1,90 @@
 # FR3K Agentic Action Engine
 
-A public, evidence-first runtime for **agents that inspect state, reason, take bounded actions across multiple external apps, and verify the result**.
+> **One runtime. Four worlds. Actions that can prove they worked.**
 
-This repository is being prepared for the 2026 Multi-App AI Agent Hackathon. The contest build window is intentionally respected: this initial commit contains the public architecture, demo contracts, reliability criteria, and four domain worlds, but **no contest implementation code**.
+A public TypeScript/Python agent platform for the 2026 Multi-App AI Agent Hackathon. It is built around a simple rule: **an agent does not get credit for saying it completed a task. It must leave observable external state and evidence that an independent evaluator can verify.**
 
-## What gets built after the starting gun
+## The control loop
 
-One reusable agent runtime, four domain worlds:
+`OBSERVE → GROUND STATE → PLAN → POLICY CHECK → ACT → READ BACK → EVALUATE → REPLAN / VERIFY → EVIDENCE`
 
-- **Lemma** — investment-thesis monitoring and valuation impact.
-- **Comma Capital** — portfolio support and operator matching.
-- **Arga Labs** — sandboxed enterprise task execution, evaluation, replay, and regression generation.
-- **Userlens** — customer-adoption interventions with measurable treatment effects.
+Not a chat wrapper. Not a chain-of-thought theater. The interesting object is the state transition.
 
-The core loop is:
+## Four company worlds
 
-`OBSERVE → MODEL STATE → PLAN → POLICY CHECK → ACT → OBSERVE AGAIN → EVALUATE → REPLAN/VERIFY → EVIDENCE`
+| World | Core problem | FR3K capability |
+|---|---|---|
+| **Lemma AI** | production agents fail semantically while tools/logs look healthy | incident → representative traces → minimal repair → regression → PR → replay/eval |
+| **Comma Capital** | founder/network knowledge is scattered and outcomes are rarely captured structurally | founder need → bottleneck diagnosis → helper ranking → approved intro → measured intervention memory |
+| **Arga Labs** | agents need production-shaped worlds where failure can be reproduced safely | failure → deterministic sandbox scenario → targeted mutations → counterfactual replay → CI regression gate |
+| **Userlens** | customer behavior can suggest next actions, but interventions need measurable learning | behavior → treatment policy → bounded action → outcome/guardrails → uplift → policy update |
 
-This is not a chatbot demo. A successful run must leave behind a machine-readable trace showing what the agent believed, which tool it selected, what changed, whether the change was allowed, and how the result was verified.
+See [`docs/COMPANY_FIT.md`](docs/COMPANY_FIT.md) for the grounding and each `worlds/*/SPEC.md` for the full build contract.
 
-## Contest reference path
+## The judged reference demo
 
-The first live end-to-end path will use at least three real external apps. The reference target is:
+The contest asks for one useful, multi-step agent connected to at least three external apps. The primary demo is therefore **one reliability/action loop**, not four unrelated demos:
 
-1. **GitHub** — mission intake, durable task/evidence record.
-2. **Google Sheets / Drive** — structured domain state and source artifacts.
-3. **Gmail** — approval-gated outbound communication.
-4. **Google Calendar** — follow-through when an intervention is accepted.
+1. a mission/failure enters through **GitHub** or a domain event;
+2. the agent reads grounded state from **Google Drive/Sheets or domain APIs**;
+3. it prepares an action in **Gmail/Slack** behind a visible approval gate;
+4. accepted follow-through can create **Google Calendar** state;
+5. it re-reads every write, evaluates invariants, and stores the evidence trace.
 
-Domain-specific adapters can later add Stripe, HubSpot, market-data/filing feeds, product analytics, Slack, and MCP servers without changing the runtime.
+The four worlds are configurations of that engine and prove it generalizes.
 
-## Runtime primitives
+## Non-negotiable runtime primitives
 
-- `Entity` — the thing the agent is reasoning about.
-- `State` — grounded facts currently known.
-- `Goal` — explicit success criteria.
-- `Event` — a change that can trigger work.
-- `Tool` — a typed, permissioned external capability.
-- `Memory` — prior observations, actions, and outcomes.
-- `Policy` — autonomy and risk constraints.
-- `Evaluator` — checks whether the action actually worked.
-- `Trace` — append-only evidence of decisions and side effects.
-- `Replay` — rerun from a checkpoint with another model/policy/memory configuration.
+- **Entity** — what is being acted on.
+- **Observation** — source-backed fact with evidence state.
+- **State** — reducer output from observations, never free-floating model memory.
+- **Goal** — explicit success and forbidden conditions.
+- **ActionIntent** — typed proposed side effect before execution.
+- **PolicyDecision** — allow / require approval / deny, with reason.
+- **Tool** — typed capability with side-effect and idempotency metadata.
+- **Verification** — read-after-write or invariant check.
+- **Evaluator** — independent grader of final state and trajectory.
+- **Trace** — append-only event stream.
+- **Replay** — rerun from a checkpoint with a different model/policy/memory/agent revision.
 
 ## Autonomy classes
 
-| Level | Meaning | Example |
-|---|---|---|
-| 0 | Observe only | Read a filing or CRM record |
-| 1 | Recommend | Propose a DCF change |
-| 2 | Human approval required | Send an operator-intro request |
-| 3 | Bounded autonomy | Send to a tiny approved cohort |
-| 4 | Autonomous in sandbox | Execute/reset/replay synthetic enterprise tasks |
-| X | Prohibited | Trading securities or unbounded destructive actions |
+| Level | Meaning | Typical example |
+|---:|---|---|
+| 0 | observe only | production API/trace access |
+| 1 | recommend | valuation/policy/change suggestion |
+| 2 | explicit approval | send external message, merge/deploy |
+| 3 | bounded reversible action | create branch, draft, sandbox write |
+| 4 | autonomous inside safe boundary | analysis, replay, sandbox execution |
+| X | prohibited | unbounded destructive action / bypass controls |
 
-Every tool call declares an autonomy class, reversibility, blast radius, and verification method.
+Every write-capable tool declares blast radius, reversibility, idempotency strategy, and verification method.
 
-## Open-source promise
+## Evidence states
 
-The public repo will contain everything required to understand and reproduce the hackathon demos: runtime contracts, state machine, policy checks, traces, replay, synthetic fixtures, baseline evaluators, connector interfaces, tests, and the four world packs.
+`VERIFIED · PARTIALLY_VERIFIED · INFERRED · UNKNOWN · CONTRADICTED · SIMULATION_ONLY · NOT_TESTED`
 
-Commercial work, if it exists later, belongs **above** that line: hosted multi-tenant operations, enterprise auth/admin, production-grade licensed-data connectors, large-scale replay/eval farms, advanced proprietary graph enrichment, and higher-end causal optimisation. Safety, auditability, and the core demos stay public.
+These states are carried through the UI and trace. A queued action is not silently promoted to VERIFIED.
 
-See `docs/ARCHITECTURE.md`, `docs/RELIABILITY.md`, `docs/OPEN_CORE_BOUNDARY.md`, and each `worlds/*/README.md`.
+## Public vs future commercial layer
+
+The public project keeps the pieces needed to understand, run, inspect, and verify the demos: state machine, policies, traces, replay, evaluators, synthetic fixtures, safe connectors, tests, and all four world packs.
+
+Potential paid value belongs above that line: managed multi-tenancy, enterprise SSO/RBAC, licensed datasets/connectors, large replay/eval fleets, proprietary graph enrichment, advanced causal optimisation, retention/compliance operations, and SLA-backed deployment.
+
+Safety and auditability are **not** premium features.
+
+## Read next
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — runtime contracts and state machine
+- [`docs/RELIABILITY.md`](docs/RELIABILITY.md) — failure semantics, verification, retries, evals
+- [`docs/JUDGING_SCORECARD.md`](docs/JUDGING_SCORECARD.md) — mapping to the official rubric
+- [`docs/COMPETITION_BRIEF.md`](docs/COMPETITION_BRIEF.md) — two-minute reference demo
+- [`worlds/lemma/SPEC.md`](worlds/lemma/SPEC.md)
+- [`worlds/comma/SPEC.md`](worlds/comma/SPEC.md)
+- [`worlds/arga/SPEC.md`](worlds/arga/SPEC.md)
+- [`worlds/userlens/SPEC.md`](worlds/userlens/SPEC.md)
+
+## Build philosophy
+
+Make every important claim clickable back to evidence. Make every consequential action stoppable. Make every failure reusable as a test. Make the UI show the work, not just the answer.
