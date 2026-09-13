@@ -10,13 +10,15 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 | Core runtime, typed tools, policy, approvals, trace | Typecheck and behavioral tests; restart, denial, malformed input, and duplicate-action coverage | Complete: 55 local runtime tests and typecheck pass; stale-lock recovery, audited repairTail, denial-authoritative projection, deadline enforcement and revision-bound approvals tested. Live integration still pending |
 | Independent evaluator and bounded replanning | Final-state and trajectory assertions; deliberate failure remains a failure; write read-back grounding | Complete: local success/failure, evidence validation, grounding and bounded-replan tests pass |
 | Durable recovery and replay | Rebuild app state from the journal after a crash; isolated baseline/candidate runs; checkpoint comparison | Complete locally: `reconstructArgaState`, idempotent refund, `replay-bridge.ts` crash replay and counterfactual diffs; tests and `npm run demo` pass |
-| Selected 3+ app adapters | Contract tests plus authenticated read/write/read-back evidence | Pending capability inventory and mission decision; GitHub adapters contract-tested only |
+| Durable outcome memory | Outcomes survive a restarted process and seed later missions; append-only, fsynced, hash-verified | Complete: `DurableMemoryStore` (memory.durable tests) persisted into the demo and reconstructed by a fresh process |
+| Model-driven planner | LLM proposal never exceeds tool/evidence/policy boundaries | Partial: bounded provider + guard + fail-closed credentials shipped and tested; live model call gated on an API key (none set) |
+| Selected 3+ app adapters | Contract tests plus authenticated read/write/read-back evidence | Partial: live GitHub read-only attach proven (`demo-live`, score 1.00); authenticating write path still operator-gated; Google unavailable |
 | First three-app mission | One coherent workflow → independent verification → durable evidence | Partial: Arga Support Desk → Billing → CRM sandbox runs at a 1.00 score and replay passes; live external-app proof pending |
 | Reliability scenarios | Transient errors, ambiguous side effects, idempotency, injection, denial, crash recovery, deadline and replay regressions pass | Complete: reliability fixtures and mission replay coverage pass locally |
 | Dashboard | Browser-verified mission, plan, state, trace, tool cards, memory, confidence, autonomy, approval, evaluation, replay, cost and latency | Partial: loopback UI and comparisons browser-verified against the real runtime; replay render and cost/latency not yet surfaced |
 | Lemma | Failed trace → reviewable repair → failing baseline/passing candidate → regression evidence | Pending |
 | Comma Capital | Grounded diagnosis → explained ranking → approval → outreach → acceptance/outcome memory | Pending |
-| Arga Labs | Duplicate-charge sandbox workflow and all eight documented adversarial variants pass appropriate evaluators | Partial: hardened v2 workflow, ledger proof and unrelated-preservation pass; adversarial variant set not implemented |
+| Arga Labs | Duplicate-charge sandbox workflow and all eight documented adversarial variants pass appropriate evaluators | Complete: hardened v2 workflow, ledger proof, unrelated-preservation, and all 8 adversarial variants verified as regression assets (`adversarial.test.ts` + demo panel); variant run caught and fixed a real partial-refund adoption bug |
 | Userlens | Bounded cohort, treatment/control, observed outcomes, and intervention-memory update | Pending |
 | Reproducibility and handoff | Clean dependency install, full tests, typecheck, CI configuration, run instructions, current status/build log | Partial: documented and runnable; publication pending |
 | Publication | Reviewed local changes and published repository state verified | Pending; see BUILD_LOG/this session |
@@ -29,12 +31,12 @@ This ledger follows the full scope in [PLAN.md](PLAN.md) and [STATUS.md](STATUS.
 
 ## Latest local verification — 2026-09-14 (gap-fill session)
 
-- `cd agentic-action-engine && npm test`: **55 passed, 0 failed, 0 skipped** (46 prior + 9 new reliability/replay tests).
+- `cd agentic-action-engine && npm test`: **70 passed, 0 failed, 0 skipped** (55 prior + durable-memory, bounded-planner, adversarial-variant and live-launcher tests).
 - `cd agentic-action-engine && npm run typecheck`: passed.
-- `npm run demo`: `CONFIRMED_SUCCESS`, evaluator **1.00**; then prints crash replay (candidate `CONFIRMED_SUCCESS`, score 1.00, zero regressions) and the v1 counterfactual (billing.duplicate-proven, billing.unrelated-preserved and support.incident-grounded are checks the old design never evaluates).
-- New reliability coverage: stale-lock recovery and live-owner busy; audited `repairTail` (snapshot preserved, only uncommitted tail truncated, corrupt committed bytes refused); denial-authoritative projection after a torn status append; `HangError` deadline on a hung planner; hung read budget exhaustion plus operator `recover()`; deployed tool-revision invalidation of a granted approval; `reconstructArgaState` and replay that never mints a second refund; counterfactual diff of the v1 design.
-- Arga v2 hardening: raw payment-ledger duplicate proof, durable refund records, exact customer/amount/currency binding, evidence-specific evaluator references, unrelated-charge read-back, and replay-safe (idempotent) refunds.
-- These results cover synthetic sandbox behavior. They do not validate live external apps, a model-driven planner, durable outcome memory, the full adversarial variant set, or publication.
+- `npm run demo`: `CONFIRMED_SUCCESS`, evaluator **1.00**; prints crash replay (candidate `CONFIRMED_SUCCESS`, score 1.00, zero regressions), the v1 counterfactual (billing.duplicate-proven, billing.unrelated-preserved and support.incident-grounded are checks the old design never evaluates), the durable-outcome reconstruction line, and an 8-variant adversarial panel (all PASS).
+- `npm run demo-live`: **live GitHub read attach** through the runtime against `fR3kdev/fR3k` — repo info, recent commits and open issues all read with the operator token and labelled `VERIFIED`; `CONFIRMED_SUCCESS`, score **1.00**, all six runtime/domain checks pass. Writes are never registered; the launcher is read-only by construction.
+- New gap-fill coverage: `DurableMemoryStore` append-only / hash-reject / reconstruct-across-restart; bounded model planner happy path plus injection-forbidden-tool, ghost-evidence-ref, write-without-evidence, finish-without-evidence, provider-hang and ref-budget violations; adversarial variants (partial-refund run exposed a real refund-adoption bug, now fixed with the full suite green); live launcher read-only construction and token fail-closed resolution.
+- These results cover synthetic sandbox behavior plus a live GitHub read attach. They do not validate a model-driven planner with a real API key, the write path of a live mission (operator-gated), or publication of the changes below.
 
 ## Latest local verification — 2026-09-14
 

@@ -6,7 +6,7 @@ Prepared 2026-09-14, Australia/Brisbane. This is the current handover after the 
 
 The repository has a working local operator dashboard attached to the actual Arga runtime, contract-tested GitHub adapters, an agent-runtime CI workflow, audited crash recovery, a crash-replay/counterfactual runner, and a hardened Arga mission that proves duplicity from the raw payment ledger. The dashboard can pause before a refund, accept an exact operator approval, execute only after a separate Resume, verify the sandbox result, repeat for CRM, and display independent evaluation. A second independent run can be denied and compared with the successful run. Crash replay rebuilds Arga app state entirely from the durable journal and re-runs the same planner/evaluator against it; a counterfactual run of the pre-hardening v1 design shows exactly which proofs it never evaluated.
 
-**The hackathon submission is not complete.** All Arga app state is synthetic and in memory (sealed in each `npm run demo`/`npm run dashboard` run). GitHub adapters are implemented but not attached to the Arga mission or verified through authenticated runtime calls. The planner is deterministic (`arga-planner-v2`), not model-driven. A live three-external-app mission, durable outcome memory, the full adversarial variant set, and publication remain unfinished.
+**The hackathon submission is not complete.** All Arga app state is synthetic and in memory (sealed in each `npm run demo`/`npm run dashboard` run). GitHub adapters are implemented and a **live read-only attach** is proven through the runtime (`npm run demo-live`, `CONFIRMED_SUCCESS`, score 1.00), but live *writes* remain operator-gated and Google services are unavailable. Replay/counterfactual, durable outcome memory and all eight adversarial variants are now implemented and tested; the model-driven planner is shipped as a bounded provider with fail-closed credentials, but has not been exercised against a real API key. A live three-external-app write mission, a model-backed run, and publication remain unfinished.
 
 The next developer should complete one coherent, evidenced vertical slice before expanding the four planned worlds. Do not represent a simulation, fixture screenshot, or connector unit test as external-app completion.
 
@@ -58,9 +58,12 @@ Preserve unrelated local changes and other workloads. Do not reset, clean or ove
 | Policy | `src/policy/engine.ts` | Tool allowlist, sandbox/live separation, autonomy and write budgets. |
 | Traces | `src/trace/jsonl.ts` | JSONL, fsync, exclusive lock, sequence and hash checks. Stale-lock recovery (dead PID releases the lock, live PID stays busy) and audited `repairTail` (snapshot-only truncation of the uncommitted tail). |
 | Evaluation | `src/eval/evaluator.ts` | Domain checks plus runtime policy, verification and grounding checks; a passing final-state claim about a run with writes must cite a confirmed read-back for each written tool. |
-| Memory | `src/memory/store.ts` | In-memory retrieval; not durable outcome memory. |
+| Memory | `src/memory/store.ts`, `src/memory/durable.ts` | In-memory retrieval plus append-only, fsynced, hash-chained `DurableMemoryStore` that persists the outcome of every terminal run and reconstructs it across a restarted process; outcomes seed later missions. |
+| Model planner | `src/model/` | Bounded model-driven planner: provider sees only a trimmed schema-valid snapshot, `guardProviderDecision` enforces tool allowlist, real evidence refs, ref budget, write-grounding and no-evidence-finish; `createFetchModelProvider` (OpenAI-compatible) and fail-closed credentials. |
 | Arga | `src/demo/arga-mission.ts` | Five tools across three simulated boundaries; v2 planner/evaluator, raw-payment-ledger duplicate proof, durable refund records, exact customer/amount/currency binding, unrelated-charge read-back, `reconstructArgaState` from the journal, replay-safe refunds. |
+| Arga variants | `src/demo/arga-variants.ts` | All eight PLAN.md adversarial variants as reproducible regression assets with invariant assertions; the partial-refund variant exposed and fixed a real refund-adoption bug. |
 | Replay | `src/demo/replay-bridge.ts` | Crash replay and counterfactual runner over rebuilt Arga state; emits baseline/candidate check diffs. |
+| Live launch | `src/live/github.ts`, `src/cli-live.ts` | Read-only GitHub attach: token from `GH_TOKEN`/`GITHUB_TOKEN` or `gh auth token` (fail closed), REST reads labelled `VERIFIED` through the runtime, writes never registered. |
 | CLI demo | `src/cli.ts` | Runs the mission, then prints crash replay and v1 counterfactual; automatically approves sandbox actions as `demo-operator`; never use this as the approval design for live actions. |
 | GitHub adapters | `src/connectors/index.ts` | Issue read and evidence comment write, fixed origin, repository allowlist, sanitized faults, exact reconciliation. |
 | Dashboard contract | `src/dashboard/bridge.ts` | Injected list, inspect, approve, resume and compare bridge. |
@@ -136,10 +139,14 @@ Do not run both launchers on the default port simultaneously. The verification s
 | Check | Observed result |
 | --- | --- |
 | Clean dependency install | Passed, Node 22 |
-| Combined `npm test` | **55 passed, 0 failed, 0 skipped** |
+| Combined `npm test` | **70 passed, 0 failed, 0 skipped** |
 | `npm run typecheck` | Passed |
-| `npm run demo` | `CONFIRMED_SUCCESS`, evaluator 1.00; replay candidate `CONFIRMED_SUCCESS` score 1.00 with zero regressions; v1 counterfactual listed the three proofs it never evaluates |
-| Reliability cases | 9 new tests: stale-lock recovery and live-owner busy; audited `repairTail` (snapshot, tail-only truncation, corrupt-prefix refusal); torn-status authoritative denial; `HangError` on a hung planner; hung-read budget exhaustion plus `recover()`; deployed tool-revision invalidating a granted approval; `reconstructArgaState` and no-second-refund replay; counterfactual diff of the v1 design |
+| `npm run demo` | `CONFIRMED_SUCCESS`, evaluator 1.00; replay candidate `CONFIRMED_SUCCESS` score 1.00 with zero regressions; v1 counterfactual listed the three proofs it never evaluates; durable-outcome reconstruction line; 8-variant adversarial panel all PASS |
+| `npm run demo-live` | `CONFIRMED_SUCCESS`, score 1.00 against `fR3kdev/fR3k`: repo info, recent commits, open issues all `VERIFIED` via the operator token; read-only by construction |
+| Reliability cases | 9 tests: stale-lock recovery and live-owner busy; audited `repairTail` (snapshot, tail-only truncation, corrupt-prefix refusal); torn-status authoritative denial; `HangError` on a hung planner; hung-read budget exhaustion plus `recover()`; deployed tool-revision invalidating a granted approval; `reconstructArgaState` and no-second-refund replay; counterfactual diff of the v1 design |
+| Durable memory cases | 3 tests: outcome memory reconstructed after a restart and fed back; append-only and hash-reject; outcome seeded into the next run |
+| Bounded planner cases | 8 tests: happy path to independent green; forbidden-tool injection; ghost evidence ref; write without evidence; finish without evidence; provider hang; fail-closed credentials; ref-budget guard |
+| Adversarial variant cases | 2 tests: all 8 variants hold invariants (partial-refund bug fixed); every variant ends terminal/policy state |
 | Connector cases | 14 passing tests: validation, allowlisting, fault sanitization, rate limiting, abort, pagination, duplicate/wrong markers, exact read-back, lost response, no blind retry |
 | Dashboard API cases | 2 tests containing multiple assertions: actor binding, stale/expired approvals, allow/deny, asynchronous resume, overlap, background errors, Origin/Host/token/path/body limits |
 | Actual bridge | 1 integration test: real Arga success versus denial, stale digest, approval does not execute, comparisons and unknown metrics |
@@ -147,7 +154,7 @@ Do not run both launchers on the default port simultaneously. The verification s
 | Actual-runtime Chromium | Keyboard approval/denial, separate resumes, completed versus denied state, comparisons, sidebar status updates, 390px mobile without page overflow, no page JS errors |
 | Git whitespace check | Passed before integration commit |
 
-Test-count breakdown: 28 runtime behavior tests + 1 Arga test + 14 connector tests + 2 dashboard API tests + 1 runtime bridge test + 9 reliability/replay tests = 55.
+Test-count breakdown: 28 runtime behavior tests + 1 Arga test + 14 connector tests + 2 dashboard API tests + 1 runtime bridge test + 9 reliability/replay tests + 3 durable memory tests + 8 bounded planner tests + 2 adversarial variant tests + 2 live launcher tests = 70.
 
 The browser run after the sidebar fix repeated the full actual-runtime acceptance and explicitly checked final sidebar statuses. Tests and screenshots prove local behavior only. Remote CI is a separate observation; use the publication record at the end of this file and the Actions page for current results.
 
@@ -186,7 +193,7 @@ The following items from the previous handover are **resolved** and covered by t
 - Unrelated-charge invariant preserved via an explicit post-refund read-back of CHG-89 and an evaluator check that no CHG-89 refund exists.
 - `reconstructArgaState(events, seed)` rebuilds Arga app state from the durable journal.
 
-**Remaining for the mission:** the planner is still deterministic (`arga-planner-v2`, emergency-driving the incident/charge IDs from closure state) and is not an LLM grounded solely in observations; full history: a bounded model-backed planner remains a submission gate. The `npm run dashboard` launcher still creates fresh in-memory app state on startup; the replay runner (not the dashboard) is the crash-recovery path today. The eight documented adversarial variants are not implemented.
+**Remaining for the mission:** the mission planner `arga-planner-v2` is deterministic and emergency-drives incident/charge IDs from closure state (full history of the bounded model-backed `src/model/` design is shipped, but no live API key is set, so no model-backed run has been certified). The `npm run dashboard` launcher still creates fresh in-memory app state on startup; the replay runner (not the dashboard) is the crash-recovery path today. Live GitHub *reads* are proven; live *writes* stay operator-gated until the exact target and operator approval exist, and a contiguous three-app write workflow has not run live.
 
 ### P0/P1: runtime crash and retry boundaries — completed in the gap-fill session
 
@@ -205,7 +212,7 @@ Reuse killed child-process and lost-response tests where appropriate; an in-proc
 
 ### P1: memory, replay and metrics
 
-Memory is in memory and lexical. There is no durable outcome update; `reconstructArgaState` + `replay-bridge.ts` now provide isolated checkpoint replay and baseline/candidate revision execution, but outcome *memory* across missions is still pending.
+`MemoryStore` provides lexical in-memory retrieval; `DurableMemoryStore` (`src/memory/durable.ts`) is now the journal-backed outcome memory: append-only, fsynced, hash-chained, and the runtime persists the outcome of every terminal run and reconstructs it across a restarted process, seeding later missions. `reconstructArgaState` + `replay-bridge.ts` provide isolated checkpoint replay and baseline/candidate revision execution.
 
 The bridge counts tool-start events and unverified write steps from traces. Score comes from the independent evaluator. Policy violations are 0 only when the runtime policy check has passed; otherwise the value is unknown. Confidence, cost and latency remain unmeasured. Trace elapsed time includes operator waiting and must not be relabelled execution latency. Add actual usage/timing instrumentation before populating those fields.
 
@@ -217,16 +224,16 @@ The UI is functional and browser-tested, but uses large embedded JavaScript/CSS 
 
 ### P2: expand only after one complete vertical slice
 
-See `PLAN.md` for Lemma, Comma Capital, Arga Labs adversarial variants and Userlens. The full domain scenarios, replay-backed repair proof, durable outcome memory and judged demo polish are unfinished. Do not mark them complete based on this dashboard delivery.
+See `PLAN.md` for Lemma, Comma Capital, Arga Labs adversarial variants and Userlens. The full domain scenarios, replay-backed repair proof, a live model-backed planner run and judged demo polish are unfinished. Do not mark them complete based on this dashboard delivery.
 
 ## 8. Suggested execution order for the successor
 
 1. Observe Git state and current Actions results. Read the directive and this handover; treat old manifests as history.
-2. Reproduce the 55-test/typecheck/demo baseline in a clean install. Run browser acceptance if modifying UI or bridge behavior.
-3. Inventory live capabilities and record exact mission/resource acceptance before external integration.
-4. The durable side-effect/recovery semantics and billing evidence are now proven in sandbox (see the marked-complete P0 sections); keep them as regression fixtures while attaching the necessary real adapters and a bounded model-backed planner to the existing runtime and dashboard, preserving approval separation.
-5. Verify a single real three-app mission and its forbidden-effects checks with retained source evidence.
-6. Implement durable outcome memory, then demonstrate a failing baseline and justified passing candidate using `replay-bridge.ts` for a different model/policy/adapter revision.
+2. Reproduce the 70-test/typecheck/demo baseline in a clean install. Run browser acceptance if modifying UI or bridge behavior.
+3. Inventory live capabilities and record exact mission/resource acceptance before any live write integration.
+4. The durable side-effect/recovery semantics, billing evidence, outcome memory, bounded model planner and adversarial variants are now proven in sandbox (see the marked-complete P0 sections); keep them as regression fixtures while attaching the necessary real adapters and a model-backed run to the existing runtime and dashboard, preserving approval separation.
+5. Verify a single real three-app mission and its forbidden-effects checks with retained source evidence; live GitHub reads are the proven anchor today, live writes await operator approval and exact targets.
+6. Demonstrate a failing baseline and justified passing candidate using `replay-bridge.ts` for a different model/policy/adapter revision.
 7. Update `STATUS.md`, `COMPLETION.md`, `BUILD_LOG.md`, demo instructions and this handover with actual evidence, limitations and commit IDs. Keep old dated verification snapshots clearly historical.
 
 ## 9. Key references

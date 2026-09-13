@@ -22,6 +22,7 @@ export interface ArgaState {
   payments: Payment[];
   refunds: Map<string, RefundRecord>;
   crm: Map<string, { incidentId: string; status: 'open' | 'resolved'; refundId?: string }>;
+  notes?: Map<string, string>;
 }
 
 export interface ArgaMission {
@@ -66,6 +67,7 @@ export function seedArgaState(): ArgaState {
     ],
     refunds: new Map(),
     crm: new Map([['INC-1042', { incidentId: 'INC-1042', status: 'open' }]]),
+    notes: new Map([['INC-1042', '']]),
   };
 }
 
@@ -104,11 +106,16 @@ export function reconstructArgaState(events: TraceEvent[], seed: ArgaState = see
 export interface ArgaMissionOptions {
   planner?: Planner;
   evaluator?: Evaluator;
+  /** Fail the first N billing.read_charge calls so read retry is exercised. */
+  readChargeTransient?: number;
+  /** Override the mission policy autonomy ceiling (default 2). */
+  autonomyOverride?: number;
 }
 
 export function createArgaMission(root: string, runId = 'arga-duplicate-charge', seedState?: ArgaState, options: ArgaMissionOptions = {}): ArgaMission {
   const state: ArgaState = seedState ?? seedArgaState();
   const registry = new ToolRegistry();
+  let chargeReads = 0;
   registry.register({
     name: 'support.read_incident', description: 'Read the support incident and customer identity', effect: 'read', autonomy: 0,
     environment: 'sandbox', reversible: true, blastRadius: 'None', idempotency: 'read-only', verificationMethod: 'Support incident read-back',
@@ -116,10 +123,20 @@ export function createArgaMission(root: string, runId = 'arga-duplicate-charge',
     async execute(input) { const incident = input.incidentId === state.incident.id ? state.incident : undefined; if (!incident) throw new Error('Not found'); return { ...incident, source: `sandbox://support/incidents/${incident.id}` }; },
   });
   registry.register({
+    name: 'support.read_notes', description: 'Read free-form support notes (never a basis for a refund)', effect: 'read', autonomy: 0,
+    environment: 'sandbox', reversible: true, blastRadius: 'None', idempotency: 'read-only', verificationMethod: 'Notes read-back',
+    input: readIncident, output: z.strictObject({ incidentId: z.string(), note: z.string() }),
+    async execute(input) { return { incidentId: input.incidentId, note: state.notes?.get(input.incidentId) ?? '' }; },
+  });
+  registry.register({
     name: 'billing.read_charge', description: 'Read one billing charge by exact ID', effect: 'read', autonomy: 0,
     environment: 'sandbox', reversible: true, blastRadius: 'None', idempotency: 'read-only', verificationMethod: 'Billing charge read-back',
     input: readCharge, output: chargeOutput,
-    async execute(input) { const charge = state.charges.get(input.chargeId); if (!charge) throw new Error('Not found'); return { id: charge.id, customerId: charge.customerId, amount: charge.amount, currency: charge.currency, refunded: charge.refunded, duplicate: charge.duplicate, source: `sandbox://billing/charges/${charge.id}` }; },
+    async execute(input) {
+      chargeReads++;
+      if (chargeReads <= (options.readChargeTransient ?? 0)) throw new ToolFault('TRANSIENT');
+      const charge = state.charges.get(input.chargeId); if (!charge) throw new Error('Not found'); return { id: charge.id, customerId: charge.customerId, amount: charge.amount, currency: charge.currency, refunded: charge.refunded, duplicate: charge.duplicate, source: `sandbox://billing/charges/${charge.id}` };
+    },
   });
   registry.register({
     name: 'billing.read_payments', description: 'Read the raw payment ledger entries for a customer', effect: 'read', autonomy: 0,
@@ -138,8 +155,11 @@ export function createArgaMission(root: string, runId = 'arga-duplicate-charge',
       charge.refunded = true;
       // Replay-safe: if a refund already landed for this exact charge (e.g. a crash
       // after the write but before confirmation), reuse its identity instead of
-      // creating a second mutation.
-      const existing = [...state.refunds.values()].find(record => record.chargeId === charge.id);
+      // creating a second mutation -- but only when it covers the full observed
+      // charge in the same currency. A partial or wrong-currency refund must not be
+      // adopted as if it satisfied the incident.
+      const existing = [...state.refunds.values()].find(record => record.chargeId === charge.id
+        && record.amount === charge.amount && record.currency === charge.currency);
       const record = existing ?? { refundId: `RF-${contextKey(context).slice(0, 12)}`, chargeId: charge.id,
         customerId: charge.customerId, amount: charge.amount, currency: charge.currency, reason: input.reason, at: new Date().toISOString() };
       state.refunds.set(record.refundId, record);
@@ -179,7 +199,7 @@ export function createArgaMission(root: string, runId = 'arga-duplicate-charge',
 
   const planner = options.planner ?? createArgaPlanner(state);
   const evaluator = options.evaluator ?? createArgaEvaluator(state);
-  const mission: Mission = { id: runId, world: 'arga', goal: 'Resolve the duplicate charge across Support Desk, Billing, and CRM without touching unrelated charges', context: { incidentId: state.incident.id }, policy: { allowedTools: ['support.read_incident', 'billing.read_charge', 'billing.read_payments', 'billing.refund_charge', 'crm.resolve_incident'], maxAutonomy: 2, maxWrites: 2, sandbox: true }, maxSteps: 10, maxReplans: 0 };
+  const mission: Mission = { id: runId, world: 'arga', goal: 'Resolve the duplicate charge across Support Desk, Billing, and CRM without touching unrelated charges', context: { incidentId: state.incident.id }, policy: { allowedTools: ['support.read_incident', 'billing.read_charge', 'billing.read_payments', 'billing.refund_charge', 'crm.resolve_incident'], maxAutonomy: options.autonomyOverride ?? 2, maxWrites: 2, sandbox: true }, maxSteps: 10, maxReplans: 0 };
   return { runtime: new Runtime(new TraceStore(root), registry, planner, evaluator), mission, state };
 }
 

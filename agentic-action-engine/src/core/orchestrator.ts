@@ -6,6 +6,7 @@ import { ToolFault, ToolRegistry, type RegisteredTool, type ToolContext, type Ve
 import { checkPolicy } from '../policy/engine.js';
 import { evaluateTrajectory } from '../eval/evaluator.js';
 import { MemoryStore, memorySchema } from '../memory/store.js';
+import { outcomeFrom, type DurableMemoryStore } from '../memory/durable.js';
 
 export interface RuntimeOptions { timeoutMs?: number; approvalTtlMs?: number; maxReadAttempts?: number }
 
@@ -32,6 +33,7 @@ export class Runtime {
     readonly evaluator: Evaluator,
     readonly memory = new MemoryStore(),
     options: RuntimeOptions = {},
+    readonly durableMemory?: DurableMemoryStore,
   ) {
     this.timeoutMs = z.int().positive().parse(options.timeoutMs ?? 30_000);
     this.approvalTtlMs = z.int().positive().parse(options.approvalTtlMs ?? 15 * 60_000);
@@ -43,7 +45,7 @@ export class Runtime {
     return this.store.withRun(mission.id, async journal => {
       if (journal.events.length) throw new Error('Run ID already exists');
       await journal.append('run.created', { mission: json(mission), planner: this.planner.id, evaluator: this.evaluator.id });
-      await journal.append('memory.retrieved', { entries: json(this.memory.retrieve(mission.world, mission.goal)) });
+      await journal.append('memory.retrieved', { entries: json((this.durableMemory ?? this.memory).retrieve(mission.world, mission.goal)) });
       return project(journal.events);
     });
   }
@@ -70,7 +72,7 @@ export class Runtime {
   }
 
   async run(runId: string): Promise<RunView> {
-    return this.store.withRun(runId, async journal => {
+    const view = await this.store.withRun(runId, async journal => {
       let view = project(journal.events);
       if (terminal.has(view.status)) return view;
       if (journal.events[0]!.data.planner !== this.planner.id || journal.events[0]!.data.evaluator !== this.evaluator.id) {
@@ -123,6 +125,15 @@ export class Runtime {
         await journal.append('plan.action', { step: `step-${count + 1}`, action: json(action), digest: this.actionDigest(view, action, tool) });
       }
     });
+    if (terminal.has(view.status) && this.durableMemory) {
+      const evaluation = view.evaluation;
+      await this.durableMemory.persist(outcomeFrom(`journal://${view.mission.id}`, {
+        id: `${view.mission.id}.outcome`, world: view.mission.world, text: `${view.status}: ${view.mission.goal}`,
+        outcome: { status: view.status, score: evaluation?.score ?? null, passed: evaluation?.passed ?? false,
+          checks: evaluation?.checks.map(check => ({ id: check.id, passed: check.passed })) ?? [] },
+      })).catch(() => undefined);
+    }
+    return view;
   }
 
   private context(journal: Journal): PlannerContext {

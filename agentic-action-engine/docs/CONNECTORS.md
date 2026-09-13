@@ -1,6 +1,6 @@
 # GitHub adapters
 
-Status: **contract-tested; live runtime verification pending**. These supplementary adapters do not replace the recorded Arga Labs sandbox mission and do not demonstrate three external apps. No Google, Gmail or Calendar adapters are included. No external writes were performed during implementation.
+Status: **contract-tested; live read runtime verification passed via the operator token**. These supplementary adapters do not replace the recorded Arga Labs sandbox mission and do not demonstrate three external apps. A live read-only attach (`npm run demo-live`) reached `CONFIRMED_SUCCESS` with all GitHub observations `VERIFIED`; live *writes* remain operator-gated and none were performed. No Google, Gmail or Calendar adapters are included.
 
 `registerLiveConnectors(registry, options)` in `src/connectors/index.ts` registers:
 

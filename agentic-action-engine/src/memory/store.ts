@@ -9,10 +9,11 @@ export const memorySchema = z.strictObject({
 export class MemoryStore {
   private readonly entries = new Map<string, MemoryEntry>();
   constructor(entries: MemoryEntry[] = []) { entries.forEach(entry => this.record(entry)); }
-  record(entry: MemoryEntry): void {
+  record(entry: MemoryEntry): MemoryEntry {
     const parsed = memorySchema.parse(entry);
     if (this.entries.has(parsed.id)) throw new Error('Memory IDs are append-only');
     this.entries.set(parsed.id, structuredClone(parsed));
+    return parsed;
   }
   retrieve(world: string, query: string, limit = 5): MemoryEntry[] {
     const terms = new Set(query.toLowerCase().match(/[a-z0-9]+/g) ?? []);

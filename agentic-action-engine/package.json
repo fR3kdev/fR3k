@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "demo": "tsx src/cli.ts",
+    "demo-live": "tsx src/cli-live.ts",
     "test": "node --import tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
     "dashboard": "tsx src/demo/dashboard-cli.ts"

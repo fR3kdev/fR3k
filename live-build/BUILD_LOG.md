@@ -6,6 +6,20 @@ It is intentionally plain: timestamp / change / evidence / next move.
 
 ---
 
+## 2026-09-14 — gap-fill: durable outcomes, bounded model planner, adversarial variants, live GitHub attach
+
+- `src/memory/durable.ts` — `DurableMemoryStore`: append-only, fsynced, per-line SHA-256 hash-chained `memory.jsonl`; `open()` rejects any hash/ID mismatch so a fork or truncation fails closed; `persist()` is not observable until the line is on disk. The runtime now records the `outcome` of every terminal run the moment it happens, and a restarted process reconstructs it from the journal alone and seeds the next mission.
+- `src/model/` — bounded model-driven planner: a `ModelPlannerProvider` only ever sees a trimmed, schema-valid `BoundedPlannerPrompt` snapshot (never the trusted ledger). `guardProviderDecision` rejects tools outside the mission policy, evidence refs that do not exist, over-budget refs, writes without observed evidence, and finishes with no evidence. `createFetchModelProvider` is the OpenAI-compatible wire path, and credentials **fail closed** (`missingModelCredentials`) — no key, no model run, no false claim.
+- `src/demo/arga-variants.ts` — all eight PLAN.md adversarial variants as reproducible regression assets: prompt injection in support notes, partial refund, wrong currency, duplicate customer identities, insufficient authorization, stale CRM state, transient tool failure, ambiguous charge labels. Each mutates the canonical incident, runs the hardened agent, and asserts invariants; the partial-refund variant **caught a real bug** (the replay-safe refund reuse adopted a ¥150 partial refund as if it were the full ¥499) which is now fixed and covered.
+- `src/live/github.ts` — live attach: token resolved from `GH_TOKEN`/`GITHUB_TOKEN` or `gh auth token` (fail-closed), read-only GitHub REST tools registered under environment `live`, writes never registered, policy pinned to `sandbox: false, maxWrites: 0`. `npm run demo-live` reached `CONFIRMED_SUCCESS` against `fR3kdev/fR3k` — repo info, recent commits and open issues all `VERIFIED`, score **1.00**.
+- Verification: `npm test` = **70 passed**, typecheck passed, `npm run demo` exits 0 (outcome-reconstruction line + 8-variant adversarial panel all PASS), `npm run demo-live` exits 0. Arga sandbox and replay evidence remain `SIMULATION_ONLY`; the live GitHub read attach is the one live external path.
+
+### Next
+
+Publish from `main` after CI confirmation; then keep the live read-only attach as the demo anchor and (if a second live app becomes available) extend the same read-path evidence pattern before any operator-gated write.
+
+---
+
 ## 2026-09-14 — gap-fill: crash recovery, replay, and hardened Arga evidence
 
 - Hardened `src/trace/jsonl.ts`: stale-lock recovery for provably dead owner PIDs (live owners stay busy), and an audited `repairTail(runId)` that snapshots the original bytes, truncates only the uncommitted journal tail, and refuses to touch a corrupted committed prefix.
