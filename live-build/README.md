@@ -8,11 +8,13 @@
 >
 > The root of the repo is the public fR3k code drop. This folder is where the competition build, reasoning, architecture, milestones, evidence, and evolving implementation plan are exposed live.
 
-For a plain-language explanation of the files, the project, and the first working milestone, read [the project synopsis](SYNOPSIS.md).
+> **ACTIVE DIRECTIVE:** All execution is now hackathon-only. Read [HACKATHON_DIRECTIVE.md](HACKATHON_DIRECTIVE.md) before starting or delegating work.
 
-Parallel development briefs: [live app connectors](DEVELOPMENT_PATHWAY_CONNECTORS.md) and [mission dashboard](DEVELOPMENT_PATHWAY_DASHBOARD.md). Each defines isolated ownership, integration contracts, tests, and handoff requirements. The [completion ledger](COMPLETION.md) tracks the main scope.
+For a plain-language explanation of the files and project, read [the project synopsis](SYNOPSIS.md).
 
-Implementation is paused for takeover. Read the [senior developer handoff manifest](HANDOFF_MANIFEST.md) for the authoritative checkout, current code, test evidence, known issues, and next steps.
+The former Gmail/Google connector brief is superseded and must not be executed. The [mission dashboard brief](DEVELOPMENT_PATHWAY_DASHBOARD.md) remains usable only when it directly advances the judged demo. The [completion ledger](COMPLETION.md) tracks verified state.
+
+Read the [senior developer handoff manifest](HANDOFF_MANIFEST.md) for the checkout, current code, test evidence and known issues.
 
 ## What I’m building
 
@@ -73,14 +75,9 @@ Every write-capable tool should declare:
 
 ## Reference multi-app path
 
-The judged demo will prove one agent can work across **at least three external apps**:
+The judged demo will prove one coherent agent workflow across **at least three necessary external apps**.
 
-1. **GitHub** — mission intake + durable task/evidence record
-2. **Google Drive / Sheets** — structured state + source artifacts
-3. **Gmail** — approval-gated outbound action
-4. **Google Calendar** — optional follow-through after acceptance
-
-The domain worlds are configurations of this engine, not separate products.
+The earlier Gmail/calendar route was rejected. App selection must follow a verified capability inventory and a written demo decision; connector availability alone is not a product idea. See the [active hackathon directive](HACKATHON_DIRECTIVE.md).
 
 ## Two-minute demo target
 
