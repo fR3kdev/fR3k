@@ -10,11 +10,15 @@
   <img src="./assets/fr3k-hero.svg" alt="fR3k Open Code Drop" width="100%" />
 </p>
 
+> **Judge summary:** A real multi-app agent that can act on external systems, prove exactly what happened, survive uncertain writes without duplicating side effects, and refuse to claim success without evidence.
+
 ## 🔴 LIVE HACKATHON PROOF: three real apps, verified writes
 
 The headline build is now a real **YouTube → GitHub → ntfy → GitHub evidence** agent, not a connector mock.
 
 On the verified run, the runtime read the live YouTube stream, grounded GitHub issue #1, stopped for exact approval before the ntfy notification, reconciled the external receipt, stopped again before the GitHub evidence write, read that comment back exactly, and finished at **`CONFIRMED_SUCCESS` / evaluator `1.00`**.
+
+**Post-submission hardening:** additional real web-server path testing was run after the submission was filed. It is additional validation, not a rewrite of the frozen judged run.
 
 **Receipts:** [`live-build/evidence/LIVE_MISSION_2026-09-14.md`](live-build/evidence/LIVE_MISSION_2026-09-14.md) · [`Issue #1`](https://github.com/fR3kdev/fR3k/issues/1)
 
