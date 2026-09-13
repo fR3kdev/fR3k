@@ -1,0 +1,88 @@
+1
+00:00:00,050 --> 00:00:02,479
+This build started with a real failure.
+
+2
+00:00:02,479 --> 00:00:07,514
+The livestream setup burned hours, so the agent turned that incident into the demo itself.
+
+3
+00:00:07,514 --> 00:00:17,467
+The mission is simple: verify the live stream, ground the work against a canonical GitHub incident, notify the operator through ntfy, and write the verified receipts back to GitHub.
+
+4
+00:00:17,467 --> 00:00:20,486
+But the interesting part is not that it touches three apps.
+
+5
+00:00:20,486 --> 00:00:23,033
+It is that every action is evidence-bound.
+
+6
+00:00:23,033 --> 00:00:31,771
+The runtime follows one loop: observe, model state, plan, policy check, act, observe again, evaluate, and leave evidence.
+
+7
+00:00:31,771 --> 00:00:34,271
+Here, YouTube is read first.
+
+8
+00:00:34,271 --> 00:00:38,611
+The agent proves the exact video identity, title, and live state.
+
+9
+00:00:38,611 --> 00:00:42,573
+Then GitHub issue number one is read as the canonical mission contract.
+
+10
+00:00:42,573 --> 00:00:45,769
+Before the first external write, the runtime stops.
+
+11
+00:00:45,769 --> 00:00:49,448
+The exact ntfy payload is hashed and requires approval.
+
+12
+00:00:49,448 --> 00:00:54,743
+After approval, the notification is sent once and read back from the exact isolated topic.
+
+13
+00:00:54,743 --> 00:00:59,012
+The real run exposed an eventual-consistency race in that verification path.
+
+14
+00:00:59,012 --> 00:01:02,125
+Instead of hiding it, the runtime failed closed.
+
+15
+00:01:02,125 --> 00:01:07,656
+We fixed the verifier, reconciled the original receipt, and did not resend the notification.
+
+16
+00:01:07,656 --> 00:01:13,257
+The second write, the GitHub evidence comment, also required exact approval and exact read-back.
+
+17
+00:01:13,257 --> 00:01:27,432
+The final independent evaluator scored the live mission one point zero: YouTube identity passed, GitHub issue identity passed, ntfy receipt passed, GitHub evidence receipt passed, and the runtime policy, verification, and grounding checks all passed.
+
+18
+00:01:27,432 --> 00:01:38,493
+That same build now has seventy-seven passing tests covering lost responses, duplicate markers, wrong issue identity, policy denial, crash recovery, replay, and adversarial cases.
+
+19
+00:01:38,493 --> 00:01:42,113
+This is not three disconnected API calls wearing a trench coat.
+
+20
+00:01:42,113 --> 00:01:48,186
+It is a bounded agent that can act, prove what happened, survive uncertainty, and refuse to fake success.
+
+21
+00:01:48,186 --> 00:01:54,507
+The code, evidence, tests, and build history are public in fR3kdev slash fR3k.
+
+22
+00:01:54,507 --> 00:01:57,750
+The entire system was built in public during the hackathon.
+

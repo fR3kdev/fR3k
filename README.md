@@ -18,6 +18,12 @@ On the verified run, the runtime read the live YouTube stream, grounded GitHub i
 
 **Receipts:** [`live-build/evidence/LIVE_MISSION_2026-09-14.md`](live-build/evidence/LIVE_MISSION_2026-09-14.md) · [`Issue #1`](https://github.com/fR3kdev/fR3k/issues/1)
 
+### 🏁 Hackathon submission
+
+**Judges: start here → [`submission/`](submission/)**
+
+The submission folder contains the **117.8-second 1080p demo video**, system/reliability brief, captions, voiceover, script, and direct public evidence links.
+
 ```bash
 cd agentic-action-engine
 npm ci

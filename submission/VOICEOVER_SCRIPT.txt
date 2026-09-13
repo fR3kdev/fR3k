@@ -1,0 +1,23 @@
+This build started with a real failure. The livestream setup burned hours, so the agent turned that incident into the demo itself.
+
+The mission is simple: verify the live stream, ground the work against a canonical GitHub incident, notify the operator through ntfy, and write the verified receipts back to GitHub.
+
+But the interesting part is not that it touches three apps. It is that every action is evidence-bound.
+
+The runtime follows one loop: observe, model state, plan, policy check, act, observe again, evaluate, and leave evidence.
+
+Here, YouTube is read first. The agent proves the exact video identity, title, and live state. Then GitHub issue number one is read as the canonical mission contract.
+
+Before the first external write, the runtime stops. The exact ntfy payload is hashed and requires approval. After approval, the notification is sent once and read back from the exact isolated topic.
+
+The real run exposed an eventual-consistency race in that verification path. Instead of hiding it, the runtime failed closed. We fixed the verifier, reconciled the original receipt, and did not resend the notification.
+
+The second write, the GitHub evidence comment, also required exact approval and exact read-back.
+
+The final independent evaluator scored the live mission one point zero: YouTube identity passed, GitHub issue identity passed, ntfy receipt passed, GitHub evidence receipt passed, and the runtime policy, verification, and grounding checks all passed.
+
+That same build now has seventy-seven passing tests covering lost responses, duplicate markers, wrong issue identity, policy denial, crash recovery, replay, and adversarial cases.
+
+This is not three disconnected API calls wearing a trench coat. It is a bounded agent that can act, prove what happened, survive uncertainty, and refuse to fake success.
+
+The code, evidence, tests, and build history are public in fR3kdev slash fR3k. The entire system was built in public during the hackathon.
