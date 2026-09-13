@@ -16,6 +16,14 @@ If something here helps your build, take it. Fork it. Break it. Make it faster. 
 
 > **Current headline drop:** a reproducible **35B-A3B Qwen run on a machine with 4 GB VRAM**.
 
+## 👁 Watch the hackathon build evolve
+
+The competition workbench lives in **[`live-build/`](live-build/)**.
+
+That folder is intentionally public and changes as the stream progresses. It contains the real four-world plan, runtime architecture, live status board, build log, evidence model, autonomy rules, and the current path toward the judged multi-app demo.
+
+**Start here:** [`live-build/README.md`](live-build/README.md)
+
 ## 🔥 Qwen 35B-A3B on 4 GB VRAM
 
 [`qwen-35b-on-4gb/`](qwen-35b-on-4gb/) contains the full Ollama benchmark/sweep kit used to run the 22.3 GiB Q4_K_M community model `huihui_ai/Qwen3.6-abliterated:35b-a3b` on a Quadro T1000 with **4 GB VRAM**.
@@ -69,8 +77,6 @@ This repo is for things worth handing to another builder, not pitch-deck confett
 - weird hardware/AI integrations;
 - small scripts that save disproportionate amounts of pain;
 - reproducible experiments with raw evidence attached.
-
-No private competitive strategy. No client/company-specific planning. No polished brochure hiding an empty folder.
 
 ## 📡 Built live
 
