@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import test, { type TestContext } from 'node:test';
+import test from 'node:test';
 import { createLiveIncidentMission } from '../src/demo/live-incident-mission.js';
 
 const repository = 'fR3kdev/fR3k';
@@ -40,7 +40,7 @@ function fakeFetch(options: { wrongIssue?: boolean } = {}) {
   }) as typeof fetch;
 }
 
-async function fixture(t: TestContext, runId: string, fetch: typeof globalThis.fetch) {
+async function fixture(t: { after(fn: () => void | Promise<void>): void }, runId: string, fetch: typeof globalThis.fetch) {
   const root = await mkdtemp(join(tmpdir(), 'fr3k-live-incident-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   return createLiveIncidentMission({ root, runId, repository, issueNumber, videoId, ntfyTopic, githubToken: async () => 'test-token', fetch });
