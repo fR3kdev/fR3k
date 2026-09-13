@@ -85,9 +85,12 @@ export function createFixtureBridge(): DashboardBridge {
       ],
     };
     if (
-      ["WAITING_FOR_APPROVAL", "RUNNING", "UNCERTAIN_SIDE_EFFECT"].includes(
-        status,
-      )
+      [
+        "WAITING_FOR_APPROVAL",
+        "RUNNING",
+        "UNCERTAIN_SIDE_EFFECT",
+        "CONFIRMED_FAILURE",
+      ].includes(status)
     )
       view.pending = { step: "step-1", action, digest: "fixture-digest" };
     if (id === "success" || id === "failure")
@@ -157,6 +160,26 @@ export function createFixtureBridge(): DashboardBridge {
         v.evaluation = { passed: true, score: 1, checks: [] };
         delete v.pending;
       }
+      return structuredClone(v);
+    },
+    async reconcile(id) {
+      const v = get(id);
+      if (v.status !== "CONFIRMED_FAILURE" || !v.pending)
+        throw new Error("Run is not eligible for write reconciliation");
+      delete v.pending;
+      v.status = "CONFIRMED_SUCCESS";
+      v.evaluation = {
+        passed: true,
+        score: 1,
+        checks: [
+          {
+            id: "synthetic-reconcile",
+            passed: true,
+            detail: "Fixture reconciliation only",
+            evidenceRefs: [1],
+          },
+        ],
+      };
       return structuredClone(v);
     },
     async compare(ids) {

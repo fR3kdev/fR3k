@@ -21,6 +21,7 @@ export function createRuntimeDashboardBridge(runtimes: ReadonlyMap<string, Runti
     inspect,
     approve(id, digest, actor, allow) { return runtime(id).approve(id, digest, actor, allow); },
     resume(id) { return runtime(id).run(id); },
+    reconcile(id) { return runtime(id).reconcileWrite(id); },
     async compare(ids): Promise<DashboardComparison> {
       return { runs: await Promise.all(ids.map(async runId => {
         const view = await inspect(runId);

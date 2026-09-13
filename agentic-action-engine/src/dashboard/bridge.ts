@@ -24,5 +24,6 @@ export interface DashboardBridge {
     allow: boolean,
   ): Promise<RunView>;
   resume(runId: string): Promise<RunView>;
+  reconcile(runId: string): Promise<RunView>;
   compare(runIds: [string, string]): Promise<DashboardComparison>;
 }

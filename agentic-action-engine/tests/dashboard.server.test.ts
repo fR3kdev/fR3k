@@ -167,3 +167,72 @@ test("resume returns immediately, rejects overlap and exposes background errors"
   assert.equal(view.dashboard.resuming, false);
   assert.equal(view.dashboard.resumeError, "Connector unavailable");
 });
+test("reconcile queues verifier-only reconciliation and guards ineligible runs", async (t) => {
+  const bridge = createFixtureBridge();
+  const app = await startDashboard({ bridge, port: 0 });
+  t.after(app.close);
+  const page = await (await fetch(app.url)).text();
+  const token = /name="dashboard-token" content="([^"]+)"/.exec(page)![1]!;
+  const post = (path: string) =>
+    fetch(app.url + path, {
+      method: "POST",
+      headers: {
+        Origin: app.url,
+        "Content-Type": "application/json",
+        "X-Dashboard-Token": token,
+      },
+      body: "{}",
+    });
+  assert.equal((await post("/api/runs/missing/reconcile")).status, 404);
+  assert.equal((await post("/api/runs/success/reconcile")).status, 409);
+  assert.equal((await post("/api/runs/denied/reconcile")).status, 409);
+  assert.equal(
+    (await bridge.inspect("failure")).status,
+    "CONFIRMED_FAILURE",
+  );
+  assert.equal((await post("/api/runs/failure/reconcile")).status, 202);
+  await new Promise((r) => setTimeout(r, 20));
+  assert.equal(
+    (await bridge.inspect("failure")).status,
+    "CONFIRMED_SUCCESS",
+  );
+  assert.equal((await bridge.inspect("failure")).pending, undefined);
+  assert.equal((await post("/api/runs/failure/reconcile")).status, 409);
+});
+test("reconcile rejects overlap and exposes background errors", async (t) => {
+  const bridge = createFixtureBridge();
+  let reject!: (error: Error) => void;
+  bridge.reconcile = () =>
+    new Promise((_, r) => {
+      reject = r;
+    });
+  const app = await startDashboard({ bridge, port: 0 });
+  t.after(app.close);
+  const page = await (await fetch(app.url)).text();
+  const token = /name="dashboard-token" content="([^"]+)"/.exec(page)![1]!;
+  const post = (path: string) =>
+    fetch(app.url + path, {
+      method: "POST",
+      headers: {
+        Origin: app.url,
+        "Content-Type": "application/json",
+        "X-Dashboard-Token": token,
+      },
+      body: "{}",
+    });
+  assert.equal((await post("/api/runs/failure/reconcile")).status, 202);
+  assert.equal((await post("/api/runs/failure/reconcile")).status, 409);
+  assert.equal(
+    (
+      await (
+        await fetch(app.url + "/api/runs/failure")
+      ).json()
+    ).dashboard.reconciling,
+    true,
+  );
+  reject(new Error("Verifier offline"));
+  await new Promise((r) => setTimeout(r, 10));
+  const view = await (await fetch(app.url + "/api/runs/failure")).json();
+  assert.equal(view.dashboard.reconciling, false);
+  assert.equal(view.dashboard.reconcileError, "Verifier offline");
+});

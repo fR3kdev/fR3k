@@ -40,7 +40,9 @@ export async function startDashboard({
   z.string().min(1).max(200).parse(actor);
   const token = randomBytes(32).toString("hex");
   const active = new Set<string>();
+  const reconciling = new Set<string>();
   const errors = new Map<string, string>();
+  const reconcileErrors = new Map<string, string>();
   let origin = "";
   const server = createServer(async (req, res) => {
     const send = (status: number, data: unknown, type = "application/json") => {
@@ -94,7 +96,7 @@ export async function startDashboard({
             identifier.parse(url.searchParams.get("candidate")),
           ]),
         );
-      const match = /^\/api\/runs\/([^/]+)(?:\/(approval|resume))?$/.exec(
+      const match = /^\/api\/runs\/([^/]+)(?:\/(approval|resume|reconcile))?$/.exec(
         url.pathname,
       );
       if (!match) throw new HttpError(404, "Route not found");
@@ -118,6 +120,8 @@ export async function startDashboard({
           dashboard: {
             resuming: active.has(id),
             resumeError: errors.get(id) ?? null,
+            reconciling: reconciling.has(id),
+            reconcileError: reconcileErrors.get(id) ?? null,
           },
         });
       if (req.method === "POST" && match[2] === "approval") {
@@ -152,6 +156,29 @@ export async function startDashboard({
             ),
           )
           .finally(() => active.delete(id));
+        return;
+      }
+      if (req.method === "POST" && match[2] === "reconcile") {
+        z.strictObject({}).parse(await body(req));
+        if (reconciling.has(id))
+          throw new HttpError(409, "Reconcile already in progress");
+        const view = await inspect();
+        if (view.status !== "CONFIRMED_FAILURE" || !view.pending)
+          throw new HttpError(409, "Reconcile requires a failed run with a pending write");
+        if (reconciling.has(id))
+          throw new HttpError(409, "Reconcile already in progress");
+        reconciling.add(id);
+        reconcileErrors.delete(id);
+        send(202, { queued: true });
+        void Promise.resolve()
+          .then(() => bridge.reconcile(id))
+          .catch((error) =>
+            reconcileErrors.set(
+              id,
+              error instanceof Error ? error.message : "Reconcile failed",
+            ),
+          )
+          .finally(() => reconciling.delete(id));
         return;
       }
       throw new HttpError(405, "Method not allowed");
