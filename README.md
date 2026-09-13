@@ -1,6 +1,14 @@
 # fR3k Open Code Drop
 
+> 🔴 **LIVE NOW:** [Watch the full Multi-App AI Agent Hackathon build on YouTube](https://youtube.com/live/eY0ChQGaEe0?si=ihuGARaRKP5ENoDZ)
+
 Useful, runnable code shared live during the Multi-App AI Agent Hackathon. Fork it, break it, improve it, and ship something strange.
+
+## Agentic Action Engine
+
+[`agentic-action-engine/`](agentic-action-engine/) is the public specification for the live competition build: one reusable evidence-first agent runtime adapted to Lemma, Comma Capital, Arga Labs, and Userlens. It is designed around observable traces, grounded state, policy-gated actions, verification after writes, evaluation, and replay.
+
+The initial public drop is intentionally architecture/specification only. Contest implementation begins in the official build window and will evolve live on stream.
 
 ## Headline giveaway: a 35B-A3B Qwen model on 4 GB VRAM
 
