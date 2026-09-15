@@ -1,8 +1,8 @@
-# fR3k Open Code Drop
+# FR3K Open Code Drop
 
-> **Build stream:** [Watch the stream or recording](https://youtube.com/live/xKOL36Yjs0U?feature=share). The verified live-state observation is dated in the mission evidence below.
+> **Hackathon recording:** [Watch the recording](https://youtube.com/live/xKOL36Yjs0U?feature=share). The verified run is documented in the mission evidence below.
 
-[![LIVE](https://img.shields.io/badge/🔴_LIVE-YOUTUBE-ff1744?style=for-the-badge)](https://youtube.com/live/xKOL36Yjs0U?feature=share)
+[![HACKATHON RECORDING](https://img.shields.io/badge/HACKATHON-RECORDING-ff8f00?style=for-the-badge)](https://youtube.com/live/xKOL36Yjs0U?feature=share)
 ![Open Source](https://img.shields.io/badge/OPEN-SOURCE-5BE7FF?style=for-the-badge&labelColor=08101f)
 ![Built in Public](https://img.shields.io/badge/BUILT-IN_PUBLIC-9C5CFF?style=for-the-badge&labelColor=08101f)
 
@@ -12,7 +12,7 @@
 
 > **Judge summary:** A real multi-app agent that can act on external systems, prove exactly what happened, survive uncertain writes without duplicating side effects, and refuse to claim success without evidence.
 
-## 🔴 LIVE HACKATHON PROOF: three real apps, verified writes
+## 🧾 Hackathon proof: three real apps, verified writes
 
 The headline build is now a real **YouTube → GitHub → ntfy → GitHub evidence** agent, not a connector mock.
 
@@ -46,11 +46,11 @@ If something here helps your build, take it. Fork it. Break it. Make it faster. 
 
 > **Local-model experiment:** a reproducible **35B-A3B Qwen run on a machine with 4 GB VRAM**.
 
-## 👁 Watch the hackathon build evolve
+## 👁 Hackathon build archive
 
 The competition workbench lives in **[`live-build/`](live-build/)**.
 
-That folder is intentionally public and changes as the stream progresses. It contains the real four-world plan, runtime architecture, live status board, build log, evidence model, autonomy rules, and the current path toward the judged multi-app demo.
+That folder is preserved as the public build record. It captures the real four-world plan, runtime architecture, status board, build log, evidence model, and autonomy rules from the run.
 
 **Start here:** [`live-build/README.md`](live-build/README.md)
 
@@ -108,13 +108,13 @@ This repo is for things worth handing to another builder, not pitch-deck confett
 - small scripts that save disproportionate amounts of pain;
 - reproducible experiments with raw evidence attached.
 
-## 📡 Built live
+## 📡 Built in public
 
-I’m building and breaking things publicly during the Multi-App AI Agent Hackathon.
+This build was developed publicly during the Multi-App AI Agent Hackathon.
 
-**Watch:** https://youtube.com/live/xKOL36Yjs0U?feature=share
+**Recording:** https://youtube.com/live/xKOL36Yjs0U?feature=share
 
-If you’re in the competition: **good luck. Steal anything useful from here.** That is literally why this repo exists.
+If you’re building something similar: **take anything useful from here.** That is literally why this repo exists.
 
 ## Licence / provenance
 
