@@ -38,7 +38,7 @@ export type EvidenceLabel = 'VERIFIED' | 'SIMULATION_ONLY';
 export type RunStatus = 'RUNNING' | 'WAITING_FOR_APPROVAL' | 'UNCERTAIN_SIDE_EFFECT'
   | 'TOOL_UNAVAILABLE' | 'DENIED_BY_POLICY' | 'CONFIRMED_FAILURE' | 'CONFIRMED_SUCCESS';
 export const eventKinds = [
-  'run.created', 'run.status', 'plan.action', 'plan.finish', 'planner.error',
+  'run.created', 'run.status', 'model.generation', 'plan.action', 'plan.finish', 'planner.error',
   'policy.decision', 'approval.requested', 'approval.granted', 'approval.denied',
   'tool.started', 'tool.result', 'tool.error', 'tool.verification', 'step.completed',
   'memory.retrieved', 'evaluation.result', 'replan.requested', 'runtime.recovery',
@@ -61,6 +61,7 @@ export interface PlannerContext {
 export interface Planner {
   id: string;
   decide(context: PlannerContext, signal: AbortSignal): Promise<unknown>;
+  drainGenerations?(): Json[];
 }
 export interface EvaluationCheck { id: string; passed: boolean; detail: string; evidenceRefs: number[] }
 export interface Evaluation { passed: boolean; score: number; checks: EvaluationCheck[] }
