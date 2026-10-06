@@ -1,6 +1,7 @@
 import { Runtime } from '../core/orchestrator.js';
-import type { EvaluationCheck, Mission, Planner, PlannerContext } from '../core/types.js';
+import { decisionSchema, type EvaluationCheck, type Mission, type Planner, type PlannerContext } from '../core/types.js';
 import { ToolRegistry } from '../tools/registry.js';
+import { createBoundedModelPlanner, createFetchModelProvider, type FetchModelEndpoint } from '../model/planner.js';
 import { TraceStore } from '../trace/jsonl.js';
 import { registerLiveConnectors } from '../connectors/index.js';
 import { registerIncidentConnectors } from '../connectors/incident.js';
@@ -14,6 +15,8 @@ export interface LiveIncidentOptions {
   ntfyTopic: string;
   githubToken: () => Promise<string>;
   fetch?: typeof globalThis.fetch;
+  model?: FetchModelEndpoint;
+  timeoutMs?: number;
 }
 
 const find = (context: PlannerContext, tool: string) => context.observations.find(observation => observation.tool === tool);
@@ -33,7 +36,7 @@ export function createLiveIncidentMission(options: LiveIncidentOptions): { runti
     fetch: options.fetch,
   });
 
-  const planner: Planner = {
+  const deterministicPlanner: Planner = {
     id: 'live-incident-planner-v1',
     async decide(context) {
       if (!find(context, 'youtube.read_live_state')) {
@@ -42,6 +45,7 @@ export function createLiveIncidentMission(options: LiveIncidentOptions): { runti
       if (!find(context, 'github.read_issue')) {
         return { kind: 'action', action: { tool: 'github.read_issue', input: { repository: options.repository, issueNumber: options.issueNumber }, reason: 'Ground the canonical incident contract in GitHub', evidenceRefs: [seq(context, 'youtube.read_live_state')!] } };
       }
+      if (value(context, 'youtube.read_live_state').isLiveNow !== true) return { kind: 'finish', reason: 'The configured stream is offline; no writes are appropriate' };
       if (!find(context, 'ntfy.publish_status')) {
         const youtube = value(context, 'youtube.read_live_state');
         const issue = value(context, 'github.read_issue');
@@ -67,6 +71,39 @@ export function createLiveIncidentMission(options: LiveIncidentOptions): { runti
         } };
       }
       return { kind: 'finish', reason: 'YouTube, GitHub, and ntfy all produced grounded and verified evidence' };
+    },
+  };
+
+  const toolOrder = ['youtube.read_live_state', 'github.read_issue', 'ntfy.publish_status', 'github.write_evidence'];
+  const selectedPlanner = options.model ? createBoundedModelPlanner({
+    provider: createFetchModelProvider({ ...options.model, instructions: 'Workflow: read the YouTube live state, then read the canonical GitHub issue, then publish a concise ntfy status grounded in those observations, then write GitHub evidence including the exact video ID and verified ntfy event ID. Use mission.context for all target identifiers. If the stream is not live, finish without writes. After all four tools have observations, finish. ' + (options.model.instructions ?? '') }),
+    tools: registry.list().map(({ name, description, inputSchema }) => ({ name, description, inputSchema })),
+    toolEffect: name => registry.get(name).effect,
+    boundaries: { allowedReadTools: toolOrder.slice(0, 2), allowedWriteTools: toolOrder.slice(2) },
+  }) : deterministicPlanner;
+  const planner: Planner = {
+    id: `${selectedPlanner.id}-incident-scope-v2`,
+    drainGenerations: () => selectedPlanner.drainGenerations?.() ?? [],
+    async decide(context, signal) {
+      const raw = await selectedPlanner.decide(context, signal);
+      const decision = decisionSchema.parse(raw);
+      if (decision.kind === 'finish') return decision;
+      const { tool, input, evidenceRefs } = decision.action;
+      const target = input as Record<string, unknown>;
+      const next = toolOrder.find(name => !find(context, name));
+      if (tool !== next) throw new Error('Mission tool order violated');
+      if (tool === 'youtube.read_live_state' && target.videoId !== options.videoId ||
+          tool.startsWith('github.') && (target.repository !== options.repository || target.issueNumber !== options.issueNumber) ||
+          tool === 'ntfy.publish_status' && target.topic !== options.ntfyTopic) throw new Error('Mission target changed');
+      if (registry.get(tool).effect === 'write') {
+        const required = context.observations.map(observation => observation.seq);
+        if (value(context, 'youtube.read_live_state').isLiveNow !== true || required.some(ref => !evidenceRefs.includes(ref))) throw new Error('Write requires live stream and all preceding evidence');
+      }
+      if (tool === 'github.write_evidence') {
+        const body = String(target.body);
+        if (!body.includes(options.videoId) || !body.includes(String(value(context, 'ntfy.publish_status').eventId))) throw new Error('Evidence must include verified video and notification receipt');
+      }
+      return decision;
     },
   };
 
@@ -98,5 +135,5 @@ export function createLiveIncidentMission(options: LiveIncidentOptions): { runti
     maxSteps: 8,
     maxReplans: 0,
   };
-  return { runtime: new Runtime(new TraceStore(options.root), registry, planner, evaluator), mission };
+  return { runtime: new Runtime(new TraceStore(options.root), registry, planner, evaluator, undefined, { timeoutMs: options.timeoutMs ?? 60_000 }), mission };
 }

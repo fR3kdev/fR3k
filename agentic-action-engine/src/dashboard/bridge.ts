@@ -8,6 +8,11 @@ export interface DashboardComparison {
     toolCalls: number;
     policyViolations: number | null;
     unverifiedWrites: number | null;
+    modelCalls?: number;
+    modelLatencyMs?: number | null;
+    modelCostUsd?: number | null;
+    inputTokens?: number | null;
+    outputTokens?: number | null;
     latencyMs: number | null;
     costUsd: number | null;
   }>;

@@ -87,11 +87,18 @@ export class Runtime {
         }
         const context = this.context(journal);
         let decision;
+        const recordGenerations = async () => {
+          for (const generation of this.planner.drainGenerations?.() ?? []) {
+            await journal.append('model.generation', { generation });
+          }
+        };
         try { decision = decisionSchema.parse(await timed(this.timeoutMs, () => this.planner.decide(context, AbortSignal.timeout(this.timeoutMs)))); }
         catch {
+          await recordGenerations();
           await journal.append('planner.error', { code: 'INVALID_OR_UNAVAILABLE_PLANNER' });
           return this.status(journal, 'CONFIRMED_FAILURE', 'Planner failed or returned an invalid decision');
         }
+        await recordGenerations();
         if (decision.kind === 'finish') {
           await journal.append('plan.finish', { reason: decision.reason });
           let evaluation;

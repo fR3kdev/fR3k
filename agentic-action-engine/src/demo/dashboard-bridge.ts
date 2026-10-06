@@ -1,3 +1,4 @@
+import { modelMetrics } from '../model/metrics.js';
 import { identifier, type RunView } from '../core/types.js';
 import type { DashboardBridge, DashboardComparison } from '../dashboard/bridge.js';
 import type { Runtime } from '../core/orchestrator.js';
@@ -33,6 +34,7 @@ export function createRuntimeDashboardBridge(runtimes: ReadonlyMap<string, Runti
           candidate.kind === 'tool.verification' && candidate.seq > event.seq && candidate.data.step === event.data.step
           && candidate.data.status === 'confirmed')).map(event => event.data.step)).size;
         return {
+          ...modelMetrics(view.events),
           runId, label: view.mission.goal, status: view.status, score: view.evaluation?.score ?? null,
           toolCalls: view.events.filter(event => event.kind === 'tool.started').length,
           policyViolations: policy?.passed ? 0 : null,
