@@ -37,6 +37,22 @@ class StudioTests(unittest.TestCase):
             finally:
                 studio.EVIDENCE_DIR = original
 
+    def test_foreign_runner_fails_closed_on_missing_assets(self):
+        original = studio.TOOLCHAINS
+        with tempfile.TemporaryDirectory() as directory:
+            studio.TOOLCHAINS = Path(directory)
+            try:
+                profile = next(p for p in studio.catalog()["profiles"] if p["id"] == "linux-arm64-user")
+                self.assertEqual("BLOCKED", studio.state(profile, studio.host())[0])
+            finally:
+                studio.TOOLCHAINS = original
+
+    def test_pinned_foreign_targets(self):
+        self.assertEqual(len(studio.FOREIGN_RUNNERS), 5)
+        for item in studio.FOREIGN_RUNNERS.values():
+            self.assertEqual(len(item["guest_sha"]), 64)
+            self.assertEqual(len(item["emulator_sha"]), 64)
+
     def test_unknown_runner_cannot_be_invoked(self):
         fake = {"id":"evil", "status":"ready", "engine":"native", "family":"Linux", "architecture":"host"}
         self.assertEqual("BLOCKED", studio.state(fake, studio.host())[0])
