@@ -115,6 +115,15 @@ def static_scan(apk, deep=False):
     return summary
 
 
+def classify_visual(package, focus, ui_text, launch_rc, pid_present, screenshot, app_crash, system_anr):
+    """A process + screenshot is never sufficient to claim the application UI passed."""
+    if system_anr or app_crash or launch_rc != 0 or not pid_present or not screenshot:
+        return "FAIL"
+    if package not in focus or not ui_text or "APP WALKTHROUGH" in ui_text:
+        return "NEEDS_REVIEW"
+    return "PASS"
+
+
 def android_smoke(apk, static, serial, output_dir):
     if not serial.startswith("emulator-") or not re.fullmatch(r"emulator-[0-9]{4,5}", serial):
         return {"status": "BLOCKED", "reason": "ONLY_EXPLICIT_EMULATORS_ALLOWED"}
@@ -155,7 +164,6 @@ def android_smoke(apk, static, serial, output_dir):
     time.sleep(7)
     pid = call("shell", "pidof", package)
     outcome["pid_present"] = pid["rc"] == 0 and pid["out"].strip().isdigit()
-    png = command([adb, "-s", serial, "exec-out", "screencap", "-p"], 30)  # text command can't preserve PNG
     # Direct binary screenshot without conversion.
     try:
         shot = subprocess.run([adb, "-s", serial, "exec-out", "screencap", "-p"],
@@ -178,10 +186,21 @@ def android_smoke(apk, static, serial, output_dir):
     outcome["crash_suspected"] = ("FATAL EXCEPTION" in logs["out"] and package in logs["out"])
     outcome["overlay_permission_state"] = call("shell", "cmd", "appops", "get",
                                                 package, "SYSTEM_ALERT_WINDOW")["out"][:350]
-    passed = (launched["rc"] == 0 and outcome["pid_present"] and
-              bool(outcome.get("screenshot_sha256")) and not outcome["crash_suspected"])
-    outcome["status"] = "PASS" if passed else "FAIL"
-    outcome["scope"] = "install_launch_screenshot_process_only"
+    focus = call("shell", "sh", "-c", "dumpsys window | grep mCurrentFocus", seconds=20)
+    focus_text = focus["out"].strip()[:350]
+    ui_status = call("shell", "uiautomator", "dump", "/sdcard/fr3k-release-ui.xml", seconds=40)
+    ui_data = call("shell", "cat", "/sdcard/fr3k-release-ui.xml", seconds=20) if ui_status["rc"] == 0 else {"rc": 1, "out": ""}
+    ui_text = ui_data["out"] if ui_data["rc"] == 0 else ""
+    outcome["focus"] = focus_text
+    outcome["ui_hierarchy_captured"] = bool(ui_text)
+    outcome["ui_hierarchy_sha256"] = hashlib.sha256(ui_text.encode()).hexdigest() if ui_text else None
+    outcome["walkthrough_modal"] = "APP WALKTHROUGH" in ui_text
+    outcome["unavailable_media_visible"] = "media not installed" in ui_text.lower()
+    outcome["system_ui_anr"] = "Application Not Responding" in focus_text or "ANR in com.android.systemui" in logs["out"]
+    outcome["status"] = classify_visual(package, focus_text, ui_text, launched["rc"],
+                                        outcome["pid_present"], bool(outcome.get("screenshot_sha256")),
+                                        outcome["crash_suspected"], outcome["system_ui_anr"])
+    outcome["scope"] = "install_launch_screenshot_foreground_ui_hierarchy"
     outcome["unverified"] = ["microphone_audio", "speech_recognition", "accessibility_service",
                              "overlay_window_visible_outside_app", "rotation", "gesture",
                              "physical_arm_device", "permissions_dialogs"]
