@@ -55,3 +55,14 @@ See [RESEARCH.md](RESEARCH.md) for upstream choices, small-repo leads and adopti
 ## Actual rootless QEMU execution (observed on Contabo, 2026-11-08)
 
 Using Ubuntu 24.04 qemu-user-static 8.2.2, five Ubuntu 24.04 statically linked BusyBox executables returned expected uname architectures and the arithmetic result 13: aarch64, armv7l, ppc64le, riscv64, s390x. These were run with explicitly named QEMU binaries; no binfmt registration, Docker privilege or KVM was used. The paths and SHA-256 executable pins are built into studio.py. On other hosts, missing or modified assets are **BLOCKED**. Evidence is in the Contabo user-owned studio store, not published raw infrastructure logs.
+
+## Android-first validation (2026-11-08)
+
+See [Android real-emulator evidence](ANDROID_EVIDENCE_2026-11-08.md). The controller is on Contabo; the KVM-backed Android 15 test guest is on X1. The original ~418MB FR3K overlay APK was installed and exercised; a visible app-owned floating window was confirmed over Android Home during a ten-scene show. This is still **NOT release cleared**: debug signing, Android voice, UI gestures, alpha correctness and physical-device coverage remain unverified.
+
+On a host with Android SDK, a test-only APK and an explicitly started emulator, use the CLI tools:
+
+- android_gate.py: static APK manifest/signing and narrow install/launch/foreground UI evidence; never substitute for a visual reviewer.
+- android_overlay_check.py: read-only checks for an app-owned visible APPLICATION_OVERLAY when Home is foreground; requires a show currently playing and overlay permission granted.
+
+The Android runners never select a physical device implicitly. The tests were compiled and 20/20 associated unit tests passed on the Contabo checkout. Live X1 evidence was integrity-verified but direct cross-device evidence transfer remains subject to a separate FR3K Fleet operator approval; see the evidence report.
