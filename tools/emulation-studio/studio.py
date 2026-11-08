@@ -87,9 +87,51 @@ RUNNERS = {
 }
 
 
+
+# Extracted distro packages in a user-owned toolchain folder, never global registration.
+TOOLCHAINS = Path(os.environ.get("FR3K_EMUL_TOOLCHAIN_DIR", str(Path.home() / ".local/share/fr3k-emulation-studio/toolchains")))
+FOREIGN_RUNNERS = {
+    "linux-arm64-user": {"emulator": "aarch64", "package_arch": "arm64", "guest_sha": "52151e7f322f926b64049cdaa1410dc3ea6485525e0624b05813791c219ae933", "emulator_sha": "e4f8d99e9ff69c3cefffab71cee358ce2af1ecba1282d04c3eeb44ef76f5a71e", "uname": "aarch64"},
+    "linux-armv7-user": {"emulator": "arm", "package_arch": "armhf", "guest_sha": "bbfba254e6875bbb25e0cfbba21e4be95f1c5980ace66925559179b8674ed4a0", "emulator_sha": "47a63bcbdf3030cf42230a0521dae38ff9d62ba1268d5cafc7d8ccf7da7c761c", "uname": "armv7l"},
+    "linux-ppc64le-user": {"emulator": "ppc64le", "package_arch": "ppc64el", "guest_sha": "07921de597b5cc0139f7892ee7cb4085ba0f07d7189996de6fa9a952656bcd03", "emulator_sha": "d90e49363a87cdfd0faff0a53710ca1073e87595f6f7470d78d99bbd417b2d65", "uname": "ppc64le"},
+    "linux-s390x-user": {"emulator": "s390x", "package_arch": "s390x", "guest_sha": "743643748780c80a39ef1f42206dd0f02e1c633eb520cbf1d32127b93fd5f369", "emulator_sha": "9d84e6eed7d0e4beb5f20aa1f4721d3f29d43fb032a7a74baf4a23852974e33d", "uname": "s390x"},
+    "linux-riscv64-user": {"emulator": "riscv64", "package_arch": "riscv64", "guest_sha": "b2e2ffe4a8af67b3aaec7f3ec39bbce32fa5ee05c241feb14e14c49f3d6d74f6", "emulator_sha": "be89e201dc6112ef101617ab575c95119ad123f80ca2b51b6c36ef218ac9df65", "uname": "riscv64"},
+}
+
+
+def digest_file(path):
+    h = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1048576), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def foreign_command(profile_id):
+    entry = FOREIGN_RUNNERS[profile_id]
+    emulator = TOOLCHAINS / "qemu-root/usr/bin" / ("qemu-" + entry["emulator"] + "-static")
+    guest = TOOLCHAINS / ("guest_" + entry["package_arch"]) / "usr/bin/busybox"
+    if not emulator.is_file() or not guest.is_file():
+        return None, "missing user-owned QEMU or foreign ELF"
+    if digest_file(emulator) != entry["emulator_sha"] or digest_file(guest) != entry["guest_sha"]:
+        return None, "toolchain SHA-256 does not match reviewed pins"
+    return [str(emulator), str(guest), "sh", "-c",
+            "printf FR3K_OK_; uname -m; expr 6 + 7"], "verified executable hashes"
+
+
+def limits_foreign():
+    resource.setrlimit(resource.RLIMIT_CPU, (15, 15))
+    resource.setrlimit(resource.RLIMIT_AS, (4 * 1024 * 1024 * 1024, 4 * 1024 * 1024 * 1024))
+    resource.setrlimit(resource.RLIMIT_NOFILE, (64, 64))
+    resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+
+
 def state(profile, facts):
     if profile["status"] != "ready":
         return "BLOCKED", "no verified runner; " + ", ".join(profile.get("requires", []))
+    if profile["id"] in FOREIGN_RUNNERS and profile["engine"] == "qemu-user":
+        cmd, reason = foreign_command(profile["id"])
+        return ("READY", reason) if cmd else ("BLOCKED", reason)
     if profile["engine"] != "native" or profile["id"] not in RUNNERS:
         return "BLOCKED", "runner not implemented"
     if facts["system"] != "Linux":
@@ -131,17 +173,26 @@ def execute(profile, facts):
     verdict, reason = state(profile, facts)
     if verdict != "READY":
         return record(profile, facts, "BLOCKED", reason, {"attempted": False})
-    cmd = RUNNERS[profile["id"]]
+    foreign = profile["id"] in FOREIGN_RUNNERS
+    cmd = foreign_command(profile["id"])[0] if foreign else RUNNERS[profile["id"]]
     started = time.monotonic()
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, errors="replace",
-                              timeout=20, preexec_fn=limits, shell=False, cwd=str(BASE),
+                              timeout=25, preexec_fn=limits_foreign if foreign else limits, shell=False, cwd=str(BASE),
                               env={"PATH": os.defpath, "LANG": "C.UTF-8"})
         output = {"attempted": True, "argv": cmd, "returncode": proc.returncode,
                   "stdout": proc.stdout[:4096], "stderr": proc.stderr[:4096],
                   "duration_ms": round((time.monotonic() - started) * 1000)}
-        return record(profile, facts, "PASS" if proc.returncode == 0 else "FAIL",
-                      "process completed" if proc.returncode == 0 else "nonzero process exit", output)
+        expected = FOREIGN_RUNNERS[profile["id"]]["uname"] if foreign else None
+        expected_output = "FR3K_OK_" + expected + "\\n13\\n" if foreign else None
+        passed = proc.returncode == 0 and (not foreign or expected_output in proc.stdout)
+        output["binary_sha256"] = {
+            "emulator": FOREIGN_RUNNERS[profile["id"]]["emulator_sha"],
+            "guest": FOREIGN_RUNNERS[profile["id"]]["guest_sha"],
+        } if foreign else {}
+        return record(profile, facts, "PASS" if passed else "FAIL",
+                      "expected emulator output verified" if passed and foreign else
+                      ("process completed" if passed else "unexpected output or exit"), output)
     except (OSError, subprocess.TimeoutExpired) as ex:
         return record(profile, facts, "FAIL", type(ex).__name__,
                       {"attempted": True, "error": str(ex)[:512],
