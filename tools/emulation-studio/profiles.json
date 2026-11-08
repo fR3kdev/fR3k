@@ -30,10 +30,10 @@
       "family": "Linux",
       "architecture": "aarch64",
       "engine": "qemu-user",
-      "status": "planned",
+      "status": "ready",
       "requires": [
-        "qemu-aarch64",
-        "arm64-rootfs"
+        "pinned-qemu-static",
+        "pinned-foreign-ELF"
       ],
       "purpose": "AArch64 userspace binaries, not a full kernel"
     },
@@ -42,12 +42,24 @@
       "family": "Linux",
       "architecture": "armv7",
       "engine": "qemu-user",
-      "status": "planned",
+      "status": "ready",
       "requires": [
-        "qemu-arm",
-        "armhf-rootfs"
+        "pinned-qemu-static",
+        "pinned-foreign-ELF"
       ],
       "purpose": "32-bit ARM userspace binaries"
+    },
+    {
+      "id": "linux-riscv64-user",
+      "family": "Linux",
+      "architecture": "riscv64",
+      "engine": "qemu-user",
+      "status": "ready",
+      "requires": [
+        "pinned-qemu-static",
+        "pinned-foreign-ELF"
+      ],
+      "purpose": "Actual RISC-V 64 Linux userspace instruction execution; not guest OS boot"
     },
     {
       "id": "linux-riscv64-system",
@@ -66,10 +78,10 @@
       "family": "Linux",
       "architecture": "ppc64le",
       "engine": "qemu-user",
-      "status": "planned",
+      "status": "ready",
       "requires": [
-        "qemu-ppc64le",
-        "ppc64le-rootfs"
+        "pinned-qemu-static",
+        "pinned-foreign-ELF"
       ],
       "purpose": "PowerPC Linux userspace"
     },
@@ -78,10 +90,10 @@
       "family": "Linux",
       "architecture": "s390x",
       "engine": "qemu-user",
-      "status": "planned",
+      "status": "ready",
       "requires": [
-        "qemu-s390x",
-        "s390x-rootfs"
+        "pinned-qemu-static",
+        "pinned-foreign-ELF"
       ],
       "purpose": "IBM Z userspace"
     },
