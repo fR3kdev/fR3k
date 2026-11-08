@@ -33,3 +33,9 @@ The authorised root SSH route from the connected phone to Contabo was verified. 
 Production signing; full video/alpha quality, move/zoom/rotation, first-run permission UX, microphone/STT/TTS and auto-listen, end-to-end voice with creatures, Android TV, older OS matrix, long-running repeated UI tests, physical ARM phones, and Contabo-to-X1 controlled jobs/evidence transfer.
 
 **Do not merge the draft PR or clear a release based solely on this smoke suite.**
+
+## Final live automated overlay check
+
+After selecting the installed Crow 10-scene track, enabling the app's own overlay permission and switching to Android Home during playback, the corrected read-only checker returned **PASS / WINDOW_MANAGER_OVERLAY_VISIBLE**, with one FR3K-owned visible window, permission allowed and launcher foreground. Receipt on X1: FR3K/emulation-studio/runs/android35-crow-overlay-live-check-v2.json. An intermediate checker returned BLOCKED/HOME_NOT_FOREGROUND because its adb shell-pipe parser failed to capture focus; the parser was fixed, tested and retested. Do not rewrite that earlier receipt. The previous zero-window observation followed the natural end of the one-scene Cassowary show.
+
+**Contabo final code validation:** 20/20 Python unit tests passed after a clean Git fast-forward. Python compilation of both Android runners succeeded. No actual Android guest OS was booted on Contabo; X1 supplied KVM-accelerated emulator execution. The isolated APK remains debug-signed, therefore public release is still blocked.
