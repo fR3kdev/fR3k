@@ -119,9 +119,13 @@ def foreign_command(profile_id):
             "printf FR3K_OK_; uname -m; expr 6 + 7"], "verified executable hashes"
 
 
+def foreign_signature(profile_id):
+    return "FR3K_OK_" + FOREIGN_RUNNERS[profile_id]["uname"] + "\n13\n"
+
+
 def limits_foreign():
     resource.setrlimit(resource.RLIMIT_CPU, (15, 15))
-    resource.setrlimit(resource.RLIMIT_AS, (4 * 1024 * 1024 * 1024, 4 * 1024 * 1024 * 1024))
+    resource.setrlimit(resource.RLIMIT_AS, (8 * 1024 * 1024 * 1024, 8 * 1024 * 1024 * 1024))
     resource.setrlimit(resource.RLIMIT_NOFILE, (64, 64))
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
 
@@ -183,9 +187,7 @@ def execute(profile, facts):
         output = {"attempted": True, "argv": cmd, "returncode": proc.returncode,
                   "stdout": proc.stdout[:4096], "stderr": proc.stderr[:4096],
                   "duration_ms": round((time.monotonic() - started) * 1000)}
-        expected = FOREIGN_RUNNERS[profile["id"]]["uname"] if foreign else None
-        expected_output = "FR3K_OK_" + expected + "\\n13\\n" if foreign else None
-        passed = proc.returncode == 0 and (not foreign or expected_output in proc.stdout)
+        passed = proc.returncode == 0 and (not foreign or foreign_signature(profile["id"]) in proc.stdout)
         output["binary_sha256"] = {
             "emulator": FOREIGN_RUNNERS[profile["id"]]["emulator_sha"],
             "guest": FOREIGN_RUNNERS[profile["id"]]["guest_sha"],
