@@ -80,7 +80,8 @@ def main():
         "release_gate": "NOT_CLEARED",
     }
     receipt["record_sha256"] = hashlib.sha256(json.dumps(receipt, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-    out = args.output or (Path(os.getenv("FR3K_ANDROID_EVIDENCE_DIR") or str(Path.home() / ".local/share/fr3k-emulation-studio/android-runs")))/ (receipt["run_id"] + "-overlay.json"))
+    evidence_root = Path(os.environ.get("FR3K_ANDROID_EVIDENCE_DIR", str(Path.home() / ".local/share/fr3k-emulation-studio/android-runs")))
+    out = args.output or (evidence_root / (receipt["run_id"] + "-overlay.json"))
     out.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
     out.chmod(0o600)
