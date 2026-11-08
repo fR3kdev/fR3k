@@ -13,6 +13,7 @@ python3 studio.py matrix
 python3 -m unittest discover -s tests -v
 python3 studio.py suite  # requires manually extracted, pinned QEMU and foreign ELF assets for full userspace matrix
 python3 studio.py report
+python3 dashboard.py  # private static dashboard, no HTTP listener
 # Recheck a returned receipt ID:
 python3 studio.py verify 20261108T000000Z-<actual-id>
 ```
@@ -46,6 +47,8 @@ GitHub artifacts -> immutable release candidate digest -> profile planner -> cen
 - **RECORD:** preserve raw logs, tool versions, guest image hashes and reviewer gate.
 
 **Resources:** keep Contabo controller + low-concurrency preflight runners. Run GPU-heavy Android tests and nested virtualization only on capable devices. Omarchy replaces retired Parrot, but was offline when observed. Existing FR3K RVM work on Contabo was left untouched.
+
+The live Contabo infrastructure-smoke result was **8/8 runnable tests PASS** (three host checks plus five rootless foreign-CPU userspace executions), **7/7 unit tests PASS**, **11 profiles still unattempted**. This is not an artifact release certification. See [EVIDENCE_2026-11-08.md](EVIDENCE_2026-11-08.md) for precise run IDs, digests, initial failed runs and blockers.
 
 See [RESEARCH.md](RESEARCH.md) for upstream choices, small-repo leads and adoption risks.
 
