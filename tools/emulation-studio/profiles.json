@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "id": "linux-amd64-native",
+      "family": "Linux",
+      "architecture": "x86_64",
+      "engine": "native",
+      "status": "ready",
+      "purpose": "Linux x86-64 execution and ABI smoke"
+    },
+    {
+      "id": "python-host-smoke",
+      "family": "Linux",
+      "architecture": "host",
+      "engine": "native",
+      "status": "ready",
+      "purpose": "Python runtime, TLS and subprocess smoke"
+    },
+    {
+      "id": "sandbox-controls",
+      "family": "Linux",
+      "architecture": "host",
+      "engine": "native",
+      "status": "ready",
+      "purpose": "Evidence and bounded process controls"
+    },
+    {
+      "id": "linux-arm64-user",
+      "family": "Linux",
+      "architecture": "aarch64",
+      "engine": "qemu-user",
+      "status": "planned",
+      "requires": [
+        "qemu-aarch64",
+        "arm64-rootfs"
+      ],
+      "purpose": "AArch64 userspace binaries, not a full kernel"
+    },
+    {
+      "id": "linux-armv7-user",
+      "family": "Linux",
+      "architecture": "armv7",
+      "engine": "qemu-user",
+      "status": "planned",
+      "requires": [
+        "qemu-arm",
+        "armhf-rootfs"
+      ],
+      "purpose": "32-bit ARM userspace binaries"
+    },
+    {
+      "id": "linux-riscv64-system",
+      "family": "Linux",
+      "architecture": "riscv64",
+      "engine": "qemu-tcg",
+      "status": "planned",
+      "requires": [
+        "qemu-system-riscv64",
+        "verified-guest-image"
+      ],
+      "purpose": "RISC-V boot and ABI smoke without KVM"
+    },
+    {
+      "id": "linux-ppc64le-user",
+      "family": "Linux",
+      "architecture": "ppc64le",
+      "engine": "qemu-user",
+      "status": "planned",
+      "requires": [
+        "qemu-ppc64le",
+        "ppc64le-rootfs"
+      ],
+      "purpose": "PowerPC Linux userspace"
+    },
+    {
+      "id": "linux-s390x-user",
+      "family": "Linux",
+      "architecture": "s390x",
+      "engine": "qemu-user",
+      "status": "planned",
+      "requires": [
+        "qemu-s390x",
+        "s390x-rootfs"
+      ],
+      "purpose": "IBM Z userspace"
+    },
+    {
+      "id": "freebsd-amd64",
+      "family": "FreeBSD",
+      "architecture": "x86_64",
+      "engine": "qemu-tcg",
+      "status": "planned",
+      "requires": [
+        "qemu-system-x86_64",
+        "verified-freebsd-image"
+      ],
+      "purpose": "Full BSD guest integration tests"
+    },
+    {
+      "id": "openwrt-arm64",
+      "family": "OpenWrt",
+      "architecture": "aarch64",
+      "engine": "qemu-tcg",
+      "status": "planned",
+      "requires": [
+        "qemu-system-aarch64",
+        "verified-openwrt-image"
+      ],
+      "purpose": "Network/firmware guest e2e, isolated network"
+    },
+    {
+      "id": "zephyr-cortex-m",
+      "family": "Zephyr",
+      "architecture": "arm-cortex-m",
+      "engine": "renode",
+      "status": "planned",
+      "requires": [
+        "renode",
+        "verified-board-resc"
+      ],
+      "purpose": "Microcontroller firmware and peripheral simulation"
+    },
+    {
+      "id": "freertos-riscv",
+      "family": "FreeRTOS",
+      "architecture": "riscv32",
+      "engine": "renode",
+      "status": "planned",
+      "requires": [
+        "renode",
+        "verified-machine-resc"
+      ],
+      "purpose": "Embedded task/scheduler regression"
+    },
+    {
+      "id": "esp32-xtensa",
+      "family": "ESP-IDF",
+      "architecture": "xtensa",
+      "engine": "qemu-espressif",
+      "status": "planned",
+      "requires": [
+        "qemu-system-xtensa",
+        "esp32-board-model"
+      ],
+      "purpose": "ESP32 firmware smoke; platform model fidelity required"
+    },
+    {
+      "id": "android-aarch64",
+      "family": "Android",
+      "architecture": "aarch64",
+      "engine": "android-emulator",
+      "status": "blocked",
+      "requires": [
+        "kvm",
+        "android-sdk",
+        "licensed-system-image"
+      ],
+      "purpose": "APK UI, mic, accessibility and overlay tests, real-device gate also required"
+    },
+    {
+      "id": "windows-amd64",
+      "family": "Windows",
+      "architecture": "x86_64",
+      "engine": "qemu-tcg",
+      "status": "blocked",
+      "requires": [
+        "licensed-windows-guest",
+        "qemu-system-x86_64",
+        "validated-resource-budget"
+      ],
+      "purpose": "Windows-native app installer and desktop tests; Wine alone is insufficient"
+    },
+    {
+      "id": "macos-arm64",
+      "family": "macOS",
+      "architecture": "aarch64",
+      "engine": "external-apple-runner",
+      "status": "blocked",
+      "requires": [
+        "apple-hardware"
+      ],
+      "purpose": "Run legal macOS GUI tests only on eligible Apple hardware"
+    },
+    {
+      "id": "ios-arm64",
+      "family": "iOS",
+      "architecture": "aarch64",
+      "engine": "external-apple-runner",
+      "status": "blocked",
+      "requires": [
+        "apple-hardware",
+        "xcode-simulator"
+      ],
+      "purpose": "iOS simulator and physical-device coverage on Apple hardware"
+    },
+    {
+      "id": "browser-cross-platform",
+      "family": "Web",
+      "architecture": "multi",
+      "engine": "playwright",
+      "status": "planned",
+      "requires": [
+        "browser-binaries",
+        "bounded-browser-worker"
+      ],
+      "purpose": "Chromium/Firefox/WebKit tests, not native OS emulation"
+    }
+  ]
+}
