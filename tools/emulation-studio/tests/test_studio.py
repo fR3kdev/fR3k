@@ -47,6 +47,11 @@ class StudioTests(unittest.TestCase):
             finally:
                 studio.TOOLCHAINS = original
 
+    def test_foreign_output_signature_is_line_based(self):
+        sig = studio.foreign_signature("linux-arm64-user")
+        self.assertEqual(sig, "FR3K_OK_aarch64\n13\n")
+        self.assertNotIn("\\\\n", sig)
+
     def test_pinned_foreign_targets(self):
         self.assertEqual(len(studio.FOREIGN_RUNNERS), 5)
         for item in studio.FOREIGN_RUNNERS.values():
