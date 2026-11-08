@@ -58,7 +58,8 @@ def main():
     if not re.fullmatch(r"[a-zA-Z][a-zA-Z0-9_.]+", args.package):
         parser.error("invalid Android package ID")
     rc, windows = command(args.serial, "shell", "dumpsys", "window", "windows")
-    _, focus = command(args.serial, "shell", "sh", "-c", "dumpsys window | grep mCurrentFocus")
+    _, focus_dump = command(args.serial, "shell", "dumpsys", "window")
+    focus = "\n".join(line for line in focus_dump.splitlines() if "mCurrentFocus=" in line)
     _, operations = command(args.serial, "shell", "cmd", "appops", "get", args.package, "SYSTEM_ALERT_WINDOW")
     candidates = windows_for_package(windows, args.package) if rc == 0 else []
     allowed = "SYSTEM_ALERT_WINDOW: allow" in operations
