@@ -39,3 +39,9 @@ Production signing; full video/alpha quality, move/zoom/rotation, first-run perm
 After selecting the installed Crow 10-scene track, enabling the app's own overlay permission and switching to Android Home during playback, the corrected read-only checker returned **PASS / WINDOW_MANAGER_OVERLAY_VISIBLE**, with one FR3K-owned visible window, permission allowed and launcher foreground. Receipt on X1: FR3K/emulation-studio/runs/android35-crow-overlay-live-check-v2.json. An intermediate checker returned BLOCKED/HOME_NOT_FOREGROUND because its adb shell-pipe parser failed to capture focus; the parser was fixed, tested and retested. Do not rewrite that earlier receipt. The previous zero-window observation followed the natural end of the one-scene Cassowary show.
 
 **Contabo final code validation:** 20/20 Python unit tests passed after a clean Git fast-forward. Python compilation of both Android runners succeeded. No actual Android guest OS was booted on Contabo; X1 supplied KVM-accelerated emulator execution. The isolated APK remains debug-signed, therefore public release is still blocked.
+
+## Evidence integrity and transfer authority
+
+Latest live overlay receipt run ID: 20261108T034917Z-ad53bd25ad; status PASS / WINDOW_MANAGER_OVERLAY_VISIBLE, one visible app-owned window, launcher foreground. A subsequent FR3K Fleet command reread the raw private X1 JSON and recomputed its canonical record SHA-256: **VERIFIED**. Source-file SHA-256: 669ee65478327ac4eb504ee14e138b85557f15523d4a1422627665c83c16659d.
+
+A separate cross-device X1-to-Contabo receipt transfer was requested but the FR3K gateway classified it as **approval_required**, job 3dfb1d7172d34f1aab6a9efa382d6e30. **No successful transfer to Contabo is claimed** and the authority gate was not bypassed. X1 original evidence remains privately available, and Contabo retains the committed code and human-readable audit notes.
