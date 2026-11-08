@@ -34,3 +34,7 @@ Do not vendor third-party code without checking provenance, license, maintenance
 4. Add Renode Robot test fixtures for LilyGo K230 / ESP32 / firmware where device models support them.
 5. Add Android overlay, microphone, background listening and accessibility tests to an authorized physical Android runner; synthetic emulator evidence remains separate.
 6. Introduce KVM-enabled external worker for Windows/Android VMs; integrate Apple hardware worker for legal macOS/iOS tests.
+
+## Additional verified experiment (2026-11-08)
+
+A rootless Ubuntu `qemu-user-static` 8.2.2 package was downloaded using `apt download`, unpacked with `dpkg-deb -x` under the FR3K service user's home, and executed directly (without sudo, Docker or binfmt registration). Signed package provenance was not independently checked for the foreign-arch BusyBox downloads; the exact extracted ELF hashes were captured and pinned in code. Five static foreign-CPU binaries were executed under QEMU: arm64/aarch64, armhf/armv7l, ppc64el/ppc64le, riscv64 and s390x. Each printed an emulated machine architecture, evaluated `expr 6 + 7` to `13` and exited with status 0. This verifies **user-mode CPU execution only**, not a guest kernel, networking, graphics, device drivers or real hardware.
