@@ -9,7 +9,16 @@ die(){ printf 'BLOCKED: %s\n' "$*" >&2; exit 2; }
 [[ "$mode" == preflight || "$mode" == stage ]] || die "use preflight or stage"
 [[ -f "$pack/geode.json" ]] || die "no complete geode.json at $pack"
 [[ ! -e "$pack/INCOMPLETE" ]] || die "conversion still marked INCOMPLETE"
-[[ ! -e "$pack/fr3k-progress.json" ]] || die "conversion progress journal still present"
+# The packer retains a resumability journal after finalization. A journal alone
+# does not mean incomplete; require all 40 layers plus absence of INCOMPLETE.
+if [[ -e "$pack/fr3k-progress.json" ]]; then
+    python3 - "$pack/fr3k-progress.json" <<'PY'
+import json,sys
+d=json.load(open(sys.argv[1]))
+if sorted(d.get('completed_layers',[]))!=list(range(40)):
+    raise SystemExit('BLOCKED: resumability journal does not record all 40 layers')
+PY
+fi
 total="$(
 python3 - "$pack" <<'PY'
 import json, pathlib, sys
