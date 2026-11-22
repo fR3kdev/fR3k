@@ -7,6 +7,14 @@ serial="$ADB_SERIAL"
 folder="/sdcard/Download/FR3K-Geode-Abliterated-Q4-V2"
 die(){ printf 'BLOCKED: %s\n' "$*" >&2; exit 2; }
 [[ "$mode" == preflight || "$mode" == stage ]] || die "use preflight or stage"
+# Enforce a single authoritative writer for this pack, across scheduled/manual jobs.
+# flock releases on process exit or termination; lock is outside the model folder.
+if [[ "$mode" == stage ]]; then
+    command -v flock >/dev/null 2>&1 || die "flock is required for model staging"
+    exec 9>"${pack%/}.fr3k-stage.lock"
+    flock -n 9 || die "a second transfer worker is already active"
+    echo "STAGING_LEASE_ACQUIRED"
+fi
 [[ -f "$pack/geode.json" ]] || die "no complete geode.json at $pack"
 [[ ! -e "$pack/INCOMPLETE" ]] || die "conversion still marked INCOMPLETE"
 # A complete-looking file set is insufficient: pin this *specific* V2 derivative.
