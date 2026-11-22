@@ -9,16 +9,34 @@ die(){ printf 'BLOCKED: %s\n' "$*" >&2; exit 2; }
 [[ "$mode" == preflight || "$mode" == stage ]] || die "use preflight or stage"
 [[ -f "$pack/geode.json" ]] || die "no complete geode.json at $pack"
 [[ ! -e "$pack/INCOMPLETE" ]] || die "conversion still marked INCOMPLETE"
-# The packer retains a resumability journal after finalization. A journal alone
-# does not mean incomplete; require all 40 layers plus absence of INCOMPLETE.
-if [[ -e "$pack/fr3k-progress.json" ]]; then
-    python3 - "$pack/fr3k-progress.json" <<'PY'
-import json,sys
-d=json.load(open(sys.argv[1]))
-if sorted(d.get('completed_layers',[]))!=list(range(40)):
-    raise SystemExit('BLOCKED: resumability journal does not record all 40 layers')
+# A complete-looking file set is insufficient: pin this *specific* V2 derivative.
+# The journal remains after finalization; require it, complete layers and exact provenance.
+[[ -f "$pack/fr3k-progress.json" ]] || die "missing source-pinned V2 conversion journal"
+python3 - "$pack" <<'PY'
+import json, pathlib, sys
+p=pathlib.Path(sys.argv[1])
+journal=json.loads((p/'fr3k-progress.json').read_text())
+manifest=json.loads((p/'geode.json').read_text())
+layers=journal.get('completed_layers')
+if not isinstance(layers,list) or any(type(x) is not int for x in layers) or sorted(layers)!=list(range(40)):
+    raise SystemExit('BLOCKED: V2 conversion journal is not 40/40')
+prov=manifest.get('fr3k_provenance')
+if not isinstance(prov,dict):
+    raise SystemExit('BLOCKED: missing FR3K V2 provenance')
+if prov.get('source_repo') != 'wangzhang/Qwen3.6-35B-A3B-abliterated-v2':
+    raise SystemExit('BLOCKED: wrong derivative source')
+for k in ('source_revision','base_revision'):
+    v=journal.get(k)
+    if not isinstance(v,str) or len(v)!=40 or any(c not in '0123456789abcdef' for c in v.lower()):
+        raise SystemExit('BLOCKED: invalid revision '+k)
+    if prov.get(k)!=v:
+        raise SystemExit('BLOCKED: revision mismatch '+k)
+if prov.get('status') != 'CONVERSION_OUTPUT_UNVERIFIED_ON_DEVICE':
+    raise SystemExit('BLOCKED: unexpected lifecycle status')
+if manifest.get('source') != prov['source_repo']+'@'+prov['source_revision']:
+    raise SystemExit('BLOCKED: manifest source does not match pinned provenance')
+print('PROVENANCE_VERIFIED: V2 derivative, 40/40 layers, immutable revisions')
 PY
-fi
 total="$(
 python3 - "$pack" <<'PY'
 import json, pathlib, sys
