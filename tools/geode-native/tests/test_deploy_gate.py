@@ -49,6 +49,17 @@ class RedmagicStagingGate(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("PREFLIGHT_FILES_OK", result.stdout)
 
+    def test_stage_refuses_second_transfer_worker(self):
+        import fcntl
+        lock_path = pathlib.Path(str(self.root) + ".fr3k-stage.lock")
+        with lock_path.open("w") as lock_file:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            env = dict(os.environ, GEODE_PACK_DIR=str(self.root), ADB_SERIAL="test-device")
+            result = subprocess.run(["bash", str(SCRIPT), "stage"],
+                                    env=env, capture_output=True, text=True, timeout=10)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("second transfer worker", result.stderr)
+
     def test_refuses_incomplete_marker(self):
         (self.root / "INCOMPLETE").write_text("Not ready")
         self.assertNotEqual(self.preflight().returncode, 0)
